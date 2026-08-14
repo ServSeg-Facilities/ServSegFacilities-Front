@@ -14,9 +14,9 @@ export default function RootLayout() {
           },
         }}
       >
-        <Stack.Screen name="login/index" />
+        {/* <Stack.Screen name="login/index" />
         <Stack.Screen name="listaRegistro/index" />
-        <Stack.Screen name="registrarPonto/index" />
+        <Stack.Screen name="registrarPonto/index" /> */}
         <Stack.Screen name="detalhesRegistro/index" />
       </Stack>
     </SafeAreaProvider>

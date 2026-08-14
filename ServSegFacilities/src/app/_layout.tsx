@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Colors } from "../constants/theme";
 
+
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
@@ -14,10 +15,10 @@ export default function RootLayout() {
           },
         }}
       >
-        <Stack.Screen name="login/index" />
-        <Stack.Screen name="listaRegistro/index" />
+        {/* <Stack.Screen name="login/index" />
+        <Stack.Screen name="listaRegistro/index" /> */}
         <Stack.Screen name="registrarPonto/index" />
-        <Stack.Screen name="detalhesRegistro/index" />
+        {/* <Stack.Screen name="detalhesRegistro/index" /> */}
       </Stack>
     </SafeAreaProvider>
   );

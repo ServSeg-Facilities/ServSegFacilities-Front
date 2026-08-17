@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TextInput, Text, Pressable } from 'react-native';
+import { View, StyleSheet, TextInput, Text, Pressable, ScrollView } from 'react-native';
 import CardLista from '../../components/cardLista/cardLista';
 import FiltroIcon from '../../../assets/icons/cuida_filter-outline.svg';
 // import { Button } from 'react-native/types_generated/index';
@@ -28,9 +28,16 @@ export default function ListaRegistro() {
                 </Pressable>
             </View>
 
-            <View style={styles.componentesCards}>
+            <ScrollView style={styles.componentesCards}>
                 <CardLista />
-            </View>
+                <CardLista />
+                <CardLista />
+                <CardLista />
+                <CardLista />
+                <CardLista />
+                <CardLista />
+                <CardLista />
+            </ScrollView>
 
         </View>
     );

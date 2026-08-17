@@ -11,11 +11,11 @@ export const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 5,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
-    elevation: 5, 
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 15, 
   },
   dataTexto: {
     fontSize: 16,

@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, TextInput, Text, Pressable } from 'react-native';
 import CardLista from '../../components/cardLista/cardLista';
+import FiltroIcon from '../../../assets/icons/cuida_filter-outline.svg';
+// import { Button } from 'react-native/types_generated/index';
 
 export default function ListaRegistro() {
     return (
@@ -9,7 +11,14 @@ export default function ListaRegistro() {
             <View style={styles.headerAzul}>
                 <View style={styles.paiInpHeader}>
                     <TextInput style={styles.input}></TextInput>
-                    <View style={styles.iconeFiltro}></View>
+                    {/* <View style={styles.iconeFiltro}></View> */}
+                    {/* <Image source={require('./assets/icons/cuida_filter-outline.svg')} /> */}
+                    <Pressable style={styles.botaoFiltro}>
+                        <FiltroIcon
+                            width={40}
+                            height={40}
+                        />
+                    </Pressable>
                 </View>
             </View>
 
@@ -35,10 +44,11 @@ const styles = StyleSheet.create({
     headerAzul: {
         width: '100%',
         height: 100,
-        backgroundColor: 'blue',
+        backgroundColor: '#007bff',
         alignItems: 'center',
         justifyContent: 'space-evenly',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        borderBottomLeftRadius: 30
     },
 
     paiInpHeader: {
@@ -62,19 +72,23 @@ const styles = StyleSheet.create({
         width: 30
     },
 
+    botaoFiltro: {
+        height: 40
+    },
+
     containerBotao: {
         padding: 20,
     },
 
     botaoRegistro: {
-        backgroundColor: 'blue',
+        backgroundColor: '#113E82',
         alignItems: 'center',
         padding: 10,
         borderRadius: 10
     },
 
     textoBotao: {
-        color: 'white'
+        color: 'white',
     },
 
     componentesCards: {

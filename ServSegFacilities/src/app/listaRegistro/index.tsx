@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
 
     textoBotao: {
         color: 'white',
+        fontSize: 20
     },
 
     componentesCards: {

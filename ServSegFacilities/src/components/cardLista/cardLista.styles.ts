@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     elevation: 15, 
   },
   dataTexto: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#183059", // Azul escuro
     marginBottom: 12,
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   infoTexto: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "600",
     color: "#183059", // Azul escuro
     marginLeft: 8,

@@ -39,7 +39,14 @@
       [
         "expo-local-authentication",
         {
-          "FaceIdPermission": "Permitir que o aplicativo use o Face ID para autenticacao segura."
+          "FaceIdPermission": "Permitir que o ServSegFacilities acesse o seu Face ID para autenticacao segura."
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Permitir que o ServSegFacilities acesse seus dados biometricos do Face ID"
         }
       ]
     ]

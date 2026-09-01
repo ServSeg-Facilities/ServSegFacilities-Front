@@ -33,6 +33,10 @@ export default function Login() {
             return;
         }
 
+        //? ALert perguntando se o usuario quer utilizar a biometria
+        //? Se o usuario quiser usar chame a função salvarDados()
+        //? Se não chamar a funcao adiarAutenticacaoLocal()
+
         try{
             await login({email: emailDigitado, senha: senhaDigitada})
             router.replace("/listaRegistro")

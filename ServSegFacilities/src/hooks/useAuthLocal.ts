@@ -3,8 +3,12 @@ import * as LocalAuthentication from 'expo-local-authentication';
 
 //? Lib que vai salvar os dados do usuario para login com autenticacao local
 import * as SecureStore from 'expo-secure-store'
+import { api } from '../services/api';
+import Login from '../app/login';
+import { useAuth } from '../contexts/AuthContext';
 
 export function useAutLocal() {
+    const { login } = useAuth();
 
     //? Função que vai fazer a verificação e acionar a pergunta se o usuario quer ativar a biometria
     async function verificarPrimeiroLogin(email: string): Promise<boolean> {
@@ -55,14 +59,24 @@ export function useAutLocal() {
         return { email, senha };
     }
 
-    //? Função que ativa a biometria na tela para autenticar o usuário
-    async function autenticar() {
+    async function verificarCompatibilidade() {
+        //? Compatibilidade do usuario com o recurso
         const compatibiliade = await LocalAuthentication.hasHardwareAsync();
         if (!compatibiliade) {
             console.log("Não tem compatibilidade!")
             return;
         }
+    }
 
+    //? Função que ativa a biometria na tela para autenticar o usuário
+    async function autenticar() {
+        //? Compatibilidade do usuario com o recurso
+        if (!verificarCompatibilidade) {
+            console.log("Não tem compatibilidade!")
+            return;
+        }
+
+        //? Resposta da verificação digital ou facial
         const resposta = await LocalAuthentication.authenticateAsync({
             promptMessage: 'Confirme sua identidade',
 
@@ -75,12 +89,17 @@ export function useAutLocal() {
             console.log("Autenticacao concluída com sucesso!")
             const dados = await pegarDados();
             console.log(`aqui na funcao certa \n- O email é: ${dados?.email} \n- A senha é ${dados?.senha}`)
-            return dados;
+
+
+            const email: string = dados?.email == null ? "" : dados.email
+            const senha: string = dados?.senha == null ? "" : dados.senha
+
+            await login({ email: email, senha: senha })
         } else {
             console.log("Falha na autenticação:", resposta.error)
             return null;
         }
     }
 
-    return { verificarPrimeiroLogin, adiarAutenticacaoLocal, autenticar, salvarDados };
+    return { verificarPrimeiroLogin, verificarCompatibilidade, adiarAutenticacaoLocal, autenticar, salvarDados };
 }

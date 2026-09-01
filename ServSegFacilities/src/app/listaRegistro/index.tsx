@@ -2,20 +2,24 @@ import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, Text, Pressable, FlatList } from 'react-native';
 import CardLista from '../../components/cardLista/cardLista';
 import FiltroIcon from '../../../assets/icons/cuida_filter-outline.svg';
+import { useLista } from '../../hooks/useLista';
+import { RegistroPonto } from '../../@types';
 
-interface RegistroPonto {
-  id: string;
-  empresa: string;
-  horario: string;
-  data: string;
-}
+const { lista, loading, error } = useLista();
+
+// interface RegistroPonto {
+//   id: string;
+//   empresa: string;
+//   horario: string;
+//   data: string;
+// }
 
 // Dados mockados temporários para validação da busca
 const REGISTROS_MOCK: RegistroPonto[] = [
-  { id: '1', empresa: 'Nascentech', horario: '09:08', data: 'Quarta-Feira, 12/08/2026' },
-  { id: '2', empresa: 'ServSeg Facilities', horario: '18:00', data: 'Quarta-Feira, 12/08/2026' },
-  { id: '3', empresa: 'Nascentech', horario: '08:55', data: 'Terça-Feira, 11/08/2026' },
-  { id: '4', empresa: 'Alpha Tech', horario: '13:00', data: 'Segunda-Feira, 10/08/2026' },
+  { id: 1, empresa: 'Nascentech', horario: '09:08', data: 'Quarta-Feira, 12/08/2026' },
+  { id: 2, empresa: 'ServSeg Facilities', horario: '18:00', data: 'Quarta-Feira, 12/08/2026' },
+  { id: 3, empresa: 'Nascentech', horario: '08:55', data: 'Terça-Feira, 11/08/2026' },
+  { id: 4, empresa: 'Alpha Tech', horario: '13:00', data: 'Segunda-Feira, 10/08/2026' },
 ];
 
 export default function ListaRegistro() {
@@ -56,12 +60,13 @@ export default function ListaRegistro() {
 
       <FlatList
         data={registrosFiltrados}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <CardLista
+            key={item.id}
             empresa={item.empresa}
-            horario={item.horario}
             data={item.data}
+            horario={item.horario}
           />
         )}
         contentContainerStyle={styles.componentesCards}
@@ -78,14 +83,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerAzul: {
-  width: '100%',
-  height: 100,
-  backgroundColor: '#007bff',
-  alignItems: 'center',
-  justifyContent: 'space-evenly', // <- Altere de 'justify' para 'justifyContent'
-  flexDirection: 'row',
-  borderBottomLeftRadius: 30,
-},
+    width: '100%',
+    height: 100,
+    backgroundColor: '#007bff',
+    alignItems: 'center',
+    justifyContent: 'space-evenly', // <- Altere de 'justify' para 'justifyContent'
+    flexDirection: 'row',
+    borderBottomLeftRadius: 30,
+  },
   paiInpHeader: {
     width: '90%',
     flexDirection: 'row',

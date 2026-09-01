@@ -8,44 +8,89 @@ import { styles as buttonStyles } from "./login.styles";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "expo-router";
 
+import { useAutLocal } from "../../hooks/useAuthLocal";
+
 const BACKGROUND_IMAGES = [
     require('../../../assets/imgs/Mapa1.png'),
     require('../../../assets/imgs/Mapa2.png'),
 ];
 
 export default function Login() {
-    //? consts para a animação das imagens.
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
-    //? consts para o consumo da API.
-    const {login} = useAuth();
+    const { login } = useAuth();
+    const { verificarPrimeiroLogin, salvarDados, adiarAutenticacaoLocal, autenticar } = useAutLocal();
+    
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const router = useRouter();
 
-    async function acessar(){
-        const emailDigitado = email.trim();
+    async function acessar() {
+        const emailDigitado = email.trim().toLowerCase();
         const senhaDigitada = senha.trim();
 
-        if(!emailDigitado || !senhaDigitada){
+        if (!emailDigitado || !senhaDigitada) {
             Alert.alert("Login Inválido!", "Preencha o e-mail e a senha corretamente.");
             return;
         }
 
-        //? ALert perguntando se o usuario quer utilizar a biometria
-        //? Se o usuario quiser usar chame a função salvarDados()
-        //? Se não chamar a funcao adiarAutenticacaoLocal()
+        try {
+            //? 1. Tenta realizar o login no contexto (Mock ou API)
+            await login({ email: emailDigitado, senha: senhaDigitada });
 
-        try{
-            await login({email: emailDigitado, senha: senhaDigitada})
-            router.replace("/listaRegistro")
-        }catch(error){
-            Alert.alert("Login Inválido!", "E-mail ou senha incorretos/inválidos.");
+            //? 2. Proteção para o fluxo de biometria
+            let devePerguntarBiometria = false;
+            try {
+                if (verificarPrimeiroLogin) {
+                    devePerguntarBiometria = await verificarPrimeiroLogin(emailDigitado);
+                }
+            } catch (bioError) {
+                console.warn("Aviso na verificação biométrica:", bioError);
+            }
+
+            if (devePerguntarBiometria) {
+                Alert.alert(
+                    "Autenticação Biométrica",
+                    "Deseja cadastrar a biometria para facilitar seus próximos acessos?",
+                    [
+                        {
+                            text: "Não",
+                            onPress: async () => {
+                                if (adiarAutenticacaoLocal) await adiarAutenticacaoLocal();
+                                router.replace("/listaRegistro");
+                            },
+                            style: "cancel"
+                        },
+                        {
+                            text: "Sim",
+                            onPress: async () => {
+                                if (salvarDados) await salvarDados(emailDigitado, senhaDigitada);
+                                router.replace("/listaRegistro");
+                            }
+                        }
+                    ]
+                );
+            } else {
+                router.replace("/listaRegistro");
+            }
+        } catch (error) {
+            console.error("Erro no login:", error);
+            Alert.alert("Login Inválido!", "E-mail ou senha incorretos ou erro de rede.");
         }
     }
 
-    //? Controle da animação.
+    async function handleLoginBiometrico() {
+        try {
+            const resultado = await autenticar();
+            if (resultado !== null) {
+                router.replace("/listaRegistro");
+            }
+        } catch (error) {
+            Alert.alert("Biometria", "Não foi possível autenticar por biometria.");
+        }
+    }
+
     useEffect(() => {
         const interval = setInterval(() => {
             Animated.timing(fadeAnim, {
@@ -77,16 +122,29 @@ export default function Login() {
             </View>
             <View style={localStyles.espacamento}>
                 <Text style={[H2, localStyles.h2]}>E-Mail</Text>
-                <TextInput style={localStyles.input} placeholder="email@email.com"
-                value={email} onChangeText={setEmail} autoCapitalize="none" />
+                <TextInput 
+                    style={localStyles.input} 
+                    placeholder="email@email.com"
+                    value={email} 
+                    onChangeText={setEmail} 
+                    autoCapitalize="none" 
+                />
                 <Text style={[H2, localStyles.h2]}>Senha</Text>
-                <TextInput style={localStyles.input} placeholder="********" secureTextEntry
-                value={senha} onChangeText={setSenha} />
-                <Pressable style={({ pressed }) =>
-                [buttonStyles.button, pressed && buttonStyles.buttonPressed]} onPress={acessar}>
+                <TextInput 
+                    style={localStyles.input} 
+                    placeholder="********" 
+                    secureTextEntry
+                    value={senha} 
+                    onChangeText={setSenha} 
+                />
+                <Pressable 
+                    style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]} 
+                    onPress={acessar}
+                >
                     <Text style={buttonStyles.ButtonText}>Entrar</Text>
                 </Pressable>
-                <Pressable> //* ⬅ Colocar o onPress da biometria nesse Pressable.
+                
+                <Pressable onPress={handleLoginBiometrico}>
                     <Biometria width={80} style={{ alignSelf: 'center' }} />
                 </Pressable>
             </View>

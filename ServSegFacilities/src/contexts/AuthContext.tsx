@@ -5,78 +5,94 @@ import { jwtDecode } from "jwt-decode";
 import { AuthContextData, Login, Usuario, UsuarioPayload } from "../@types/autenticacao";
 import { autenticacaoService } from "../services/autenticacaoService";
 
+//? Usuário mockado feito para testes rápidos sem necessidade de rodar API.
+const MOCK_USUARIO = {
+  email: "mock@mock",
+  senha: "mock",
+};
+
+const MOCK_TOKEN = "mock_jwt_token_servseg_testes";
+const MOCK_USUARIO_DADOS: Usuario = {
+  id: "999",
+  nome: "Usuário Mock",
+  email: MOCK_USUARIO.email,
+};
+
 const TOKEN_KEY = process.env.EXPO_PUBLIC_TOKEN_KEY || "ChaveToken";
 
-// 1. Criamos o Contexto que vai guardar os dados globais de login
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function decodificarToken(token: string): Usuario | null {
+  if (token === MOCK_TOKEN) {
+    return MOCK_USUARIO_DADOS;
+  }
+
   try {
-    // Decodifica a string criptografada do JWT em um objeto JS
     const decoded = jwtDecode<UsuarioPayload>(token);
 
-    // Mapeia as chaves (claims) do backend para o nosso objeto Usuario
     return {
       id: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || "",
       nome: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] || "",
       email: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] || "",
     };
   } catch {
-    // Se o token for inválido ou estiver corrompido, retorna null
     return null;
   }
 }
 
-// 3. Componente Provedor (Provider): envolve as telas e compartilha os dados de autenticação
-//React.FC:significa React.FunctionComponent (Componente Funcional do React).
-//Trata-se de um tipo nativo do TypeScript usado para definir que uma constante ou variável é um componente funcional do React.
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-//O AuthProvider é um componente React que vai abraçar/envolver outros componentes (children) dentro dele."
-  const [usuario, setUsuario] = useState<Usuario | null>(null); // Guarda o usuário logado ({ nome, email, id })
-  const [token, setToken] = useState<string | null>(null);       // Guarda a string do token JWT
-  const [loading, setLoading] = useState(true);                  // Indica se ainda está verificando o token ao abrir o app
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Executado UMA vez assim que o aplicativo é aberto
   useEffect(() => {
-    // Busca se já existe um token salvo do login anterior
     AsyncStorage.getItem(TOKEN_KEY)
       .then((tokenSalvo) => {
         if (tokenSalvo) {
           setToken(tokenSalvo);
-          setUsuario(decodificarToken(tokenSalvo)); // Preenche o usuário automaticamente
+          setUsuario(decodificarToken(tokenSalvo));
         }
       })
-      .finally(() => setLoading(false)); // Finaliza o carregamento inicial
+      .finally(() => setLoading(false));
   }, []);
 
-  // Função para fazer Login
   async function login(dados: Login) {
-    // Envia e-mail e senha para a API
+    //* CORREÇÃO: Comparação case-insensitive (ignora maiúsculas do teclado móvel).
+    const emailLimpo = dados.email.trim().toLowerCase();
+    const senhaLimpa = dados.senha.trim();
+
+    if (emailLimpo === MOCK_USUARIO.email && senhaLimpa === MOCK_USUARIO.senha) {
+      console.log("⚡ [MOCK] Autenticado com sucesso!");
+      await AsyncStorage.setItem(TOKEN_KEY, MOCK_TOKEN);
+      setToken(MOCK_TOKEN);
+      setUsuario(MOCK_USUARIO_DADOS);
+      return;
+    }
+
+    //? Envia e-mail e senha para a API real.
     const resposta = await autenticacaoService.login(dados);
 
     if (resposta.token) {
-      setToken(resposta.token);                         // Guarda o token no estado
-      setUsuario(decodificarToken(resposta.token));     // Decodifica e salva o usuário no estado
+      await AsyncStorage.setItem(TOKEN_KEY, resposta.token);
+      setToken(resposta.token);
+      setUsuario(decodificarToken(resposta.token));
     }
   }
 
-  // Função para fazer Logout (Sair da Conta)
   async function logout() {
-    await AsyncStorage.removeItem(TOKEN_KEY); // Apaga o token do celular
-    setToken(null);                           // Limpa o token da memória
-    setUsuario(null);                         // Limpa o usuário da memória
-    router.replace("/login");                 // Redireciona de volta para a tela de login
+    await AsyncStorage.removeItem(TOKEN_KEY);
+    setToken(null);
+    setUsuario(null);
+    router.replace("/login");
   }
 
   return (
-    // Compartilha o estado e as funções com todos os componentes filhos
     <AuthContext.Provider value={{ usuario, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// 4. Hook customizado para consumir os dados do AuthContext de forma rápida nas telas
 export function useAuth() {
   return useContext(AuthContext);
 }

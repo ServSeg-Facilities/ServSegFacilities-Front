@@ -94,5 +94,22 @@ export function useAutLocal() {
         }
     }
 
-    return { verificarPrimeiroLogin, verificarCompatibilidade, adiarAutenticacaoLocal, autenticar, salvarDados };
+    //? Função para verificar se a biometria já foi ativada/configurada.
+    async function isBiometriaAtiva(): Promise<boolean> {
+        const eCompativel = await verificarCompatibilidade();
+        if (!eCompativel) return false;
+
+        const email = await SecureStore.getItemAsync('UsuarioEmail');
+        const senha = await SecureStore.getItemAsync('UsuarioSenha');
+        return Boolean(email && senha);
+    }
+
+    return {
+        verificarPrimeiroLogin,
+        verificarCompatibilidade,
+        adiarAutenticacaoLocal,
+        autenticar,
+        salvarDados,
+        isBiometriaAtiva
+    };
 }

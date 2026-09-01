@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Animated, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Colors, Font, H1, H2 } from "../../constants/theme";
-
 import Logo from '../../../assets/imgs/ServSeg Escuro.svg';
 import Biometria from '../../../assets/icons/Biometria.svg';
 import { styles as buttonStyles } from "./login.styles";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "expo-router";
-
 import { useAutLocal } from "../../hooks/useAuthLocal";
 
 const BACKGROUND_IMAGES = [
@@ -18,13 +16,24 @@ const BACKGROUND_IMAGES = [
 export default function Login() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const fadeAnim = useRef(new Animated.Value(1)).current;
+    const [BioAtiva, setBioAtiva] = useState(false);
 
     const { login } = useAuth();
-    const { verificarPrimeiroLogin, salvarDados, adiarAutenticacaoLocal, autenticar } = useAutLocal();
-    
+    const { verificarPrimeiroLogin, salvarDados, adiarAutenticacaoLocal,
+        autenticar, isBiometriaAtiva } = useAutLocal();
+
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const router = useRouter();
+
+    useEffect(() => {
+        async function checkBio() {
+            if (isBiometriaAtiva) {
+                const ativa = await isBiometriaAtiva();
+                setBioAtiva(ativa);
+            }
+        } checkBio();
+    }, [isBiometriaAtiva]);
 
     async function acessar() {
         const emailDigitado = email.trim().toLowerCase();
@@ -66,6 +75,7 @@ export default function Login() {
                             text: "Sim",
                             onPress: async () => {
                                 if (salvarDados) await salvarDados(emailDigitado, senhaDigitada);
+                                setBioAtiva(true); //* ⬅ Atualiza o estado caso o usuário permita.
                                 router.replace("/listaRegistro");
                             }
                         }
@@ -122,31 +132,33 @@ export default function Login() {
             </View>
             <View style={localStyles.espacamento}>
                 <Text style={[H2, localStyles.h2]}>E-Mail</Text>
-                <TextInput 
-                    style={localStyles.input} 
+                <TextInput
+                    style={localStyles.input}
                     placeholder="email@email.com"
-                    value={email} 
-                    onChangeText={setEmail} 
-                    autoCapitalize="none" 
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
                 />
                 <Text style={[H2, localStyles.h2]}>Senha</Text>
-                <TextInput 
-                    style={localStyles.input} 
-                    placeholder="********" 
+                <TextInput
+                    style={localStyles.input}
+                    placeholder="********"
                     secureTextEntry
-                    value={senha} 
-                    onChangeText={setSenha} 
+                    value={senha}
+                    onChangeText={setSenha}
                 />
-                <Pressable 
-                    style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]} 
+                <Pressable
+                    style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]}
                     onPress={acessar}
                 >
                     <Text style={buttonStyles.ButtonText}>Entrar</Text>
                 </Pressable>
-                
-                <Pressable onPress={handleLoginBiometrico}>
-                    <Biometria width={80} style={{ alignSelf: 'center' }} />
-                </Pressable>
+
+                {BioAtiva && (
+                    <Pressable onPress={handleLoginBiometrico} style={{ marginTop: 20 }}>
+                        <Biometria width={80} style={{ alignSelf: 'center' }} />
+                    </Pressable>
+                )}
             </View>
         </View>
     );

@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
-import { Colors, Container, H1, Button, ButtonText, P, H2 } from "../../constants/theme";
-import CardDetalhes from "./cardDetalhes";
+import { Colors, P, H2 } from "../../constants/theme";
 
 export const styles = StyleSheet.create({
     cardDetalhe:{
@@ -16,7 +15,7 @@ export const styles = StyleSheet.create({
         elevation: 4,
     },
 
-    identificacaoEmpresa:{
+    identificacaoENomeEmpresa:{
         gap: 10
     },
 

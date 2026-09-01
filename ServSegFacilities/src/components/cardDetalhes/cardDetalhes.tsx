@@ -1,47 +1,39 @@
-import { View, Text, Pressable, ScrollView, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text } from "react-native";
 import { styles } from "./cardDetalhes.styles";
-import MapView, { Marker } from "react-native-maps";
-import * as Location from "expo-location";
 import { AntDesign, Feather, Octicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme";
-import { useEffect, useState } from "react";
+import MapView, { Marker } from "react-native-maps";
+import { DetalhesRegistro } from "../../@types/detalhesRegistro";
 
-export default function CardDetalhe() {
-  const [localizacao, setLocalizacao] =
-    useState<Location.LocationObjectCoords | null>(null);
+interface CardDetalheProps {
+  detalhes: DetalhesRegistro;
+}
 
-  useEffect(() => {
-    async function obterLocalizacao() {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
-        const location = await Location.getCurrentPositionAsync({});
-        setLocalizacao(location.coords);
-      }
-    }
-    obterLocalizacao();
-  }, []);
-
+export default function CardDetalhe({ detalhes }: CardDetalheProps) {
   return (
     <View style={styles.cardDetalhe}>
-      <View style={styles.identificacaoEmpresa}>
+      <View style={styles.identificacaoENomeEmpresa}>
         <View style={styles.informacao}>
           <View style={styles.titulo}>
             <Feather name="user" size={18} color={Colors.AzulTexto} />
+
             <Text style={styles.texto}>Identificação:</Text>
           </View>
+
           <View style={styles.campoValor}>
-            <Text style={styles.infoTexto}>João Silva Santos</Text>
+            <Text style={styles.infoTexto}>{detalhes.nome}</Text>
           </View>
         </View>
 
         <View style={styles.informacao}>
           <View style={styles.titulo}>
             <Octicons name="organization" size={18} color={Colors.AzulTexto} />
+
             <Text style={styles.texto}>Empresa:</Text>
           </View>
+
           <View style={styles.campoValor}>
-            <Text style={styles.infoTexto}>Nascentech</Text>
+            <Text style={styles.infoTexto}>{detalhes.razaoSocial}</Text>
           </View>
         </View>
       </View>
@@ -50,69 +42,69 @@ export default function CardDetalhe() {
         <View style={styles.colunaHorario}>
           <View style={styles.titulo}>
             <AntDesign name="clock-circle" size={16} color={Colors.AzulTexto} />
+
             <Text style={styles.texto}>Entrada</Text>
           </View>
 
-          <Text style={styles.horario}>09 : 08</Text>
+          <Text style={styles.horario}>{detalhes.entrada.horario}</Text>
 
           <View style={styles.miniMapa}>
-            {localizacao ? (
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: localizacao.latitude,
-                  longitude: localizacao.longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: detalhes.entrada.localizacao.latitude,
+                longitude: detalhes.entrada.localizacao.longitude,
+                latitudeDelta: detalhes.entrada.localizacao.precisao,
+                longitudeDelta: detalhes.entrada.localizacao.precisao,
+              }}
+              scrollEnabled={false}
+              zoomEnabled={false}
+            >
+              <Marker
+                coordinate={{
+                  latitude: detalhes.entrada.localizacao.latitude,
+                  longitude: detalhes.entrada.localizacao.longitude,
                 }}
-                scrollEnabled={false}
-                zoomEnabled={false}
-              >
-                <Marker
-                  coordinate={{
-                    latitude: localizacao.latitude,
-                    longitude: localizacao.longitude,
-                  }}
-                />
-              </MapView>
-            ) : (
-              <Text style={styles.mapaCarregando}>...</Text>
-            )}
+              />
+            </MapView>
           </View>
         </View>
 
         <View style={styles.colunaHorario}>
           <View style={styles.titulo}>
             <AntDesign name="clock-circle" size={16} color={Colors.AzulTexto} />
+
             <Text style={styles.texto}>Saída</Text>
           </View>
 
-          <Text style={styles.horario}>16 : 05</Text>
+          {detalhes.saida ? (
+            <>
+              <Text style={styles.horario}>{detalhes.saida.horario}</Text>
 
-          <View style={styles.miniMapa}>
-            {localizacao ? (
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: localizacao.latitude,
-                  longitude: localizacao.longitude,
-                  latitudeDelta: 0.005,
-                  longitudeDelta: 0.005,
-                }}
-                scrollEnabled={false}
-                zoomEnabled={false}
-              >
-                <Marker
-                  coordinate={{
-                    latitude: localizacao.latitude,
-                    longitude: localizacao.longitude,
+              <View style={styles.miniMapa}>
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: detalhes.saida.localizacao.latitude,
+                    longitude: detalhes.saida.localizacao.longitude,
+                    latitudeDelta: detalhes.saida.localizacao.precisao,
+                    longitudeDelta: detalhes.saida.localizacao.precisao,
                   }}
-                />
-              </MapView>
-            ) : (
-              <Text style={styles.mapaCarregando}>...</Text>
-            )}
-          </View>
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: detalhes.saida.localizacao.latitude,
+                      longitude: detalhes.saida.localizacao.longitude,
+                    }}
+                  />
+                </MapView>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.horario}>Não registrado</Text>
+          )}
         </View>
       </View>
     </View>

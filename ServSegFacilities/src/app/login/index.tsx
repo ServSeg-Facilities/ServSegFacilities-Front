@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Animated, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Colors, Font, H1, H2 } from "../../constants/theme";
-
 import Logo from '../../../assets/imgs/ServSeg Escuro.svg';
 import Biometria from '../../../assets/icons/Biometria.svg';
 import { styles as buttonStyles } from "./login.styles";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "expo-router";
+import { useCam } from "../../hooks/useCam";
 
 const BACKGROUND_IMAGES = [
     require('../../../assets/imgs/Mapa1.png'),
@@ -24,6 +24,9 @@ export default function Login() {
     const [senha, setSenha] = useState("");
     const router = useRouter();
 
+    //* TESTE CAMERA --> consts para funções extras:
+    const {tirarFoto} = useCam();
+
     async function acessar(){
         const emailDigitado = email.trim();
         const senhaDigitada = senha.trim();
@@ -33,15 +36,24 @@ export default function Login() {
             return;
         }
 
-        //? ALert perguntando se o usuario quer utilizar a biometria
-        //? Se o usuario quiser usar chame a função salvarDados()
-        //? Se não chamar a funcao adiarAutenticacaoLocal()
-
         try{
             await login({email: emailDigitado, senha: senhaDigitada})
             router.replace("/listaRegistro")
         }catch(error){
             Alert.alert("Login Inválido!", "E-mail ou senha incorretos/inválidos.");
+        }
+    }
+
+    //* TESTE CAMERA --> Function para integrar a camera:
+    async function handleCam() {
+        try {
+            const foto = await tirarFoto();
+
+            if(foto){
+                console.log("Foto capturada com sucesso:", foto);
+            }
+        }catch(error){
+            Alert.alert("Erro!", "Não foi possível capturar a foto.");
         }
     }
 
@@ -86,8 +98,13 @@ export default function Login() {
                 [buttonStyles.button, pressed && buttonStyles.buttonPressed]} onPress={acessar}>
                     <Text style={buttonStyles.ButtonText}>Entrar</Text>
                 </Pressable>
-                <Pressable> //* ⬅ Colocar o onPress da biometria nesse Pressable.
+                <Pressable>
                     <Biometria width={80} style={{ alignSelf: 'center' }} />
+                </Pressable>
+
+                {/* //* TESTE CAMERA --> */}
+                <Pressable onPress={handleCam}>
+                    <Text>Usar Câmera</Text>
                 </Pressable>
             </View>
         </View>

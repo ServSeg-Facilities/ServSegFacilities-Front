@@ -22,7 +22,6 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <Stack
-        initialRouteName="login/index"
         screenOptions={{
           headerShown: false,
           animation: "simple_push",
@@ -31,7 +30,6 @@ export default function RootLayout() {
           },
         }}
       >
-        <Stack.Screen name="login/index" />
         <Stack.Screen name="registrarPonto/index" />
       </Stack>
     </SafeAreaProvider>

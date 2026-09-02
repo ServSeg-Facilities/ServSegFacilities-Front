@@ -5,8 +5,8 @@ import { styles } from "./registrarPonto.styles";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { AntDesign } from "@expo/vector-icons";
+import { Colors } from "../../constants/theme";
 import { api, getAuthToken } from "../../services/api";
-import { router } from "expo-router";
 
 // Coordenada padrão (Praça da Sé - SP, sede da empresa cadastrada no banco)
 const COORDENADA_EMPRESA_PADRAO = {
@@ -116,9 +116,7 @@ export default function RegistrarPonto() {
     }
 
     if (!getAuthToken()) {
-      Alert.alert("Atenção", "Sessão expirada. Faça login novamente.", [
-        { text: "OK", onPress: () => router.replace("/login") },
-      ]);
+      Alert.alert("Atenção", "Usuário não autenticado. Forneça o token de acesso.");
       return;
     }
 

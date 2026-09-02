@@ -1,20 +1,20 @@
 //Açoes, a fazeres, finalidades
 //Acoes da lista
-import { Lista } from "../@types/lista";
+import { ListaRecebida } from "../@types/lista";
 import { api } from "./api";
 
 //
 export const listaService = {
-    async listar(): Promise<Lista[]> {
-        const response = await api.get<Lista[]>("Lista")
+    async listarHistoricoPontos(): Promise<ListaRecebida[]> {
+        const response = await api.get<ListaRecebida[]>("HistoricoRegistroPonto")
         return response.data;
     },
 
-    async cadastrar(dados: Lista): Promise<Lista> {
+    async cadastrar(dados: ListaRecebida): Promise<ListaRecebida> {
         const formData = new FormData();
         //? formData.append("nomeDeAlgo", dados.nomeDeAlgo);
 
-        const resposta = await api.post<Lista>("Lista", formData, {
+        const resposta = await api.post<ListaRecebida>("Lista", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

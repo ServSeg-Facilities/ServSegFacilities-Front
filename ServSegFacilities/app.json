@@ -29,7 +29,13 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O ServSegFacilities pode acessar suas fotos para realizar a emissão de pontos"
+        }
+      ]
     ]
   }
 }

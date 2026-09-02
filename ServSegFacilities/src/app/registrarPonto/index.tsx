@@ -7,12 +7,11 @@ import * as Location from "expo-location";
 import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme";
 import { api } from "../../services/api";
+import { Header } from "../../components/header/header";
 
-// Token JWT válido para autenticação com a API (Usuário 4 - Admin)
 const DEFAULT_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQWRtaW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbkBzZXJ2c2VnLmNvbSIsImlzcyI6IlNlcnZTZWdBUEkiLCJhdWQiOiJTZXJ2U2VnQVBJIiwibmJmIjoxNzg4MTc0ODI1LCJleHAiOjE4MTk3MTA4MjV9.mPpkv87L0YSdnxgCe2pNJLDmFmKjHJfm6B6U7R4whRo";
 
-// Coordenada padrão (Praça da Sé - SP, sede da empresa cadastrada no banco)
 const COORDENADA_EMPRESA_PADRAO = {
   latitude: -23.55052,
   longitude: -46.633309,
@@ -29,7 +28,6 @@ export default function RegistrarPonto() {
   const [dataHoraAtual, setDataHoraAtual] = useState(new Date());
   const [carregando, setCarregando] = useState(false);
 
-  // Atualização em tempo real do relógio
   useEffect(() => {
     const timer = setInterval(() => {
       setDataHoraAtual(new Date());
@@ -38,7 +36,6 @@ export default function RegistrarPonto() {
     return () => clearInterval(timer);
   }, []);
 
-  // Obtenção da localização do usuário com fallback automático para emulador
   useEffect(() => {
     async function obterLocalizacao() {
       try {
@@ -62,7 +59,6 @@ export default function RegistrarPonto() {
           setLocalizacao(COORDENADA_EMPRESA_PADRAO);
         }
       } catch {
-        // Em caso de erro na obtenção do GPS do notebook/emulador, usa as coordenadas da empresa
         setLocalizacao(COORDENADA_EMPRESA_PADRAO);
       }
     }
@@ -70,7 +66,6 @@ export default function RegistrarPonto() {
     obterLocalizacao();
   }, []);
 
-  // Conversão e formatação da data em GMT-3 (Horário de Brasília)
   const converterParaGMT3 = (data: Date) => {
     const utc = data.getTime() + data.getTimezoneOffset() * 60000;
     return new Date(utc - 3 * 3600000);
@@ -112,7 +107,6 @@ export default function RegistrarPonto() {
     return `${hora} : ${min}`;
   };
 
-  // Envio da requisição de registro de ponto (Entrada / Saída)
   const handleRegistrar = async () => {
     if (!localizacao) {
       Alert.alert("Aviso", "Obtendo localização, aguarde...");
@@ -124,7 +118,6 @@ export default function RegistrarPonto() {
     setCarregando(true);
 
     try {
-      // 1 = Entrada, 2 = Saída
       const tipoRegistroId = tipoRegistro === "entrada" ? 1 : 2;
 
       const resposta = await api.post(
@@ -150,11 +143,9 @@ export default function RegistrarPonto() {
 
       Alert.alert("Sucesso", mensagemSucesso);
 
-      // Alterna automaticamente entre entrada e saída após registro bem-sucedido
       setTipoRegistro(tipoRegistro === "entrada" ? "saida" : "entrada");
     } catch (error: any) {
       if (error.response) {
-        // Resposta de erro do backend (ex: regras de negócio / DomainException)
         const mensagem =
           typeof error.response.data === "string"
             ? error.response.data
@@ -174,14 +165,8 @@ export default function RegistrarPonto() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Pressable style={styles.conteudoHeader} onPress={() => {}}>
-          <AntDesign name="arrow-left" size={24} color={Colors.AzulFundo} />
-          <Text style={styles.divisorHeader}>|</Text>
-          <Text style={styles.tituloHeader}>Ponto Eletrônico</Text>
-        </Pressable>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={["bottom", "left", "right"]}>
+      <Header titulo="Ponto Eletrônico" />
 
       <Text style={styles.titulo}>Registrar Ponto:</Text>
 

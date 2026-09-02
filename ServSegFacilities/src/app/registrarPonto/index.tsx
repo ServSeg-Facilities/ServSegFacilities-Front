@@ -116,7 +116,10 @@ export default function RegistrarPonto() {
     }
 
     if (!getAuthToken()) {
-      Alert.alert("Atenção", "Usuário não autenticado. Forneça o token de acesso.");
+      Alert.alert(
+        "Sessão Não Encontrada",
+        "Você precisa estar conectado à sua conta para registrar o ponto. Por favor, faça login novamente."
+      );
       return;
     }
 

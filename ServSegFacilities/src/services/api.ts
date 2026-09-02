@@ -24,7 +24,7 @@ export const api = axios.create({
   timeout: 10000,
 });
 
-let authToken: string | null = null;
+let authToken: string | null = process.env.EXPO_PUBLIC_TOKEN || null;
 
 export const setAuthToken = (token: string | null) => {
   authToken = token;

@@ -5,12 +5,8 @@ import { styles } from "./registrarPonto.styles";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { AntDesign } from "@expo/vector-icons";
-import { Colors } from "../../constants/theme";
-import { api } from "../../services/api";
-
-// Token JWT válido para autenticação com a API (Usuário 4 - Admin)
-const DEFAULT_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQWRtaW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbkBzZXJ2c2VnLmNvbSIsImlzcyI6IlNlcnZTZWdBUEkiLCJhdWQiOiJTZXJ2U2VnQVBJIiwibmJmIjoxNzg4MTc0ODI1LCJleHAiOjE4MTk3MTA4MjV9.mPpkv87L0YSdnxgCe2pNJLDmFmKjHJfm6B6U7R4whRo";
+import { api, getAuthToken } from "../../services/api";
+import { router } from "expo-router";
 
 // Coordenada padrão (Praça da Sé - SP, sede da empresa cadastrada no banco)
 const COORDENADA_EMPRESA_PADRAO = {
@@ -119,6 +115,13 @@ export default function RegistrarPonto() {
       return;
     }
 
+    if (!getAuthToken()) {
+      Alert.alert("Atenção", "Sessão expirada. Faça login novamente.", [
+        { text: "OK", onPress: () => router.replace("/login") },
+      ]);
+      return;
+    }
+
     if (carregando) return;
 
     setCarregando(true);
@@ -127,19 +130,11 @@ export default function RegistrarPonto() {
       // 1 = Entrada, 2 = Saída
       const tipoRegistroId = tipoRegistro === "entrada" ? 1 : 2;
 
-      const resposta = await api.post(
-        "/RegistroPonto",
-        {
-          latitude: localizacao.latitude,
-          longitude: localizacao.longitude,
-          tipoRegistroId: tipoRegistroId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${DEFAULT_TOKEN}`,
-          },
-        }
-      );
+      const resposta = await api.post("/RegistroPonto", {
+        latitude: localizacao.latitude,
+        longitude: localizacao.longitude,
+        tipoRegistroId: tipoRegistroId,
+      });
 
       const mensagemSucesso =
         typeof resposta.data === "string"

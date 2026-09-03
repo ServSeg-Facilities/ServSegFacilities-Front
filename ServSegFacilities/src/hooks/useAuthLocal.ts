@@ -5,7 +5,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import { useAuth } from '../contexts/AuthContext';
 
-export function useAutLocal() {
+export function useAuthLocal() {
     const { login } = useAuth();
 
     //? Função que vai fazer a verificação e acionar a pergunta se o usuario quer ativar a biometria
@@ -104,12 +104,20 @@ export function useAutLocal() {
         return Boolean(email && senha);
     }
 
+    async function resetarDados() {
+        await SecureStore.deleteItemAsync('UsuarioEmail');
+        await SecureStore.deleteItemAsync('UsuarioSenha');
+        await SecureStore.deleteItemAsync('dataAvisoAutenticacaoLocal');
+        console.log("Dados do SecureStore limpos com sucesso!");
+    }
+
     return {
         verificarPrimeiroLogin,
         verificarCompatibilidade,
         adiarAutenticacaoLocal,
         autenticar,
         salvarDados,
-        isBiometriaAtiva
+        isBiometriaAtiva,
+        resetarDados,
     };
 }

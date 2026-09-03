@@ -6,7 +6,7 @@ import Biometria from '../../../assets/icons/Biometria.svg';
 import { styles as buttonStyles } from "./login.styles";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "expo-router";
-import { useAutLocal } from "../../hooks/useAuthLocal";
+import { useAuthLocal } from "../../hooks/useAuthLocal";
 
 const BACKGROUND_IMAGES = [
     require('../../../assets/imgs/Mapa1.png'),
@@ -19,8 +19,9 @@ export default function Login() {
     const [BioAtiva, setBioAtiva] = useState(false);
 
     const { login } = useAuth();
+    const { resetarDados, ...restanteHook } = useAuthLocal();
     const { verificarPrimeiroLogin, salvarDados, adiarAutenticacaoLocal,
-        autenticar, isBiometriaAtiva } = useAutLocal();
+        autenticar, isBiometriaAtiva } = useAuthLocal();
 
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
@@ -149,13 +150,16 @@ export default function Login() {
                 />
                 <Pressable
                     style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]}
-                    onPress={acessar}
-                >
-                    <Text style={buttonStyles.ButtonText}>Entrar</Text>
+                    onPress={acessar}><Text style={buttonStyles.ButtonText}>Entrar</Text>
+                </Pressable>
+                <Pressable
+                    style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]}
+                    onPress={async () => {await resetarDados(); setBioAtiva(false); Alert.alert("Dados Resetados!", "Dados biométricos apagados.");}}>
+                        <Text style={buttonStyles.ButtonText}>[DEV] Resetar Biometria</Text>
                 </Pressable>
 
                 {BioAtiva && (
-                    <Pressable onPress={handleLoginBiometrico} style={{ marginTop: 20 }}>
+                    <Pressable onPress={handleLoginBiometrico} style={{ marginTop: -20 }}>
                         <Biometria width={80} style={{ alignSelf: 'center' }} />
                     </Pressable>
                 )}

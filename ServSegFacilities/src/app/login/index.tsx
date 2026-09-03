@@ -8,9 +8,14 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "expo-router";
 import { useAuthLocal } from "../../hooks/useAuthLocal";
 
-const BACKGROUND_IMAGES = [
+// 1. Imagem fixa de fundo
+const BASE_BACKGROUND = require('../../../assets/imgs/FundoMapas.png');
+
+// 2. Apenas os mapas que vão alternar no carrossel
+const MAP_IMAGES = [
     require('../../../assets/imgs/Mapa1.png'),
     require('../../../assets/imgs/Mapa2.png'),
+    require('../../../assets/imgs/Mapa3.png'),
 ];
 
 export default function Login() {
@@ -46,10 +51,8 @@ export default function Login() {
         }
 
         try {
-            //? 1. Tenta realizar o login no contexto (Mock ou API)
             await login({ email: emailDigitado, senha: senhaDigitada });
 
-            //? 2. Proteção para o fluxo de biometria
             let devePerguntarBiometria = false;
             try {
                 if (verificarPrimeiroLogin) {
@@ -76,7 +79,7 @@ export default function Login() {
                             text: "Sim",
                             onPress: async () => {
                                 if (salvarDados) await salvarDados(emailDigitado, senhaDigitada);
-                                setBioAtiva(true); //* ⬅ Atualiza o estado caso o usuário permita.
+                                setBioAtiva(true);
                                 router.replace("/listaRegistro");
                             }
                         }
@@ -102,6 +105,7 @@ export default function Login() {
         }
     }
 
+    // Loop do carrossel alterado para usar MAP_IMAGES
     useEffect(() => {
         const interval = setInterval(() => {
             Animated.timing(fadeAnim, {
@@ -109,7 +113,7 @@ export default function Login() {
                 duration: 250,
                 useNativeDriver: true,
             }).start(() => {
-                setCurrentImageIndex((prevIndex) => (prevIndex + 1) % BACKGROUND_IMAGES.length);
+                setCurrentImageIndex((prevIndex) => (prevIndex + 1) % MAP_IMAGES.length);
                 Animated.timing(fadeAnim, {
                     toValue: 1,
                     duration: 500,
@@ -122,15 +126,25 @@ export default function Login() {
 
     return (
         <View style={{ flex: 1, position: 'relative' }}>
+            {/* Imagem de Fundo Estática (Sempre Visível no Rodapé) */}
             <Animated.Image
-                source={BACKGROUND_IMAGES[currentImageIndex]}
-                style={{ width: '100%', height: 400, position: 'absolute', opacity: fadeAnim }}
+                source={BASE_BACKGROUND}
+                style={localStyles.backgroundImage}
                 resizeMode="cover"
             />
+
+            {/* Imagem do Carrossel Alternante (Sobrepõe o Fundo com Fade) */}
+            <Animated.Image
+                source={MAP_IMAGES[currentImageIndex]}
+                style={[localStyles.backgroundImage, { opacity: fadeAnim }]}
+                resizeMode="cover"
+            />
+
             <View style={localStyles.logo}>
                 <Logo width={150} style={{ marginBottom: -100 }} />
                 <Text style={H1}>ServSeg Facilities</Text>
             </View>
+
             <View style={localStyles.espacamento}>
                 <Text style={[H2, localStyles.h2]}>E-Mail</Text>
                 <TextInput
@@ -139,6 +153,7 @@ export default function Login() {
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"
+                    keyboardType="email-address"
                 />
                 <Text style={[H2, localStyles.h2]}>Senha</Text>
                 <TextInput
@@ -150,12 +165,14 @@ export default function Login() {
                 />
                 <Pressable
                     style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]}
-                    onPress={acessar}><Text style={buttonStyles.ButtonText}>Entrar</Text>
+                    onPress={acessar}>
+                    <Text style={buttonStyles.ButtonText}>Entrar</Text>
                 </Pressable>
+                
                 <Pressable
                     style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]}
-                    onPress={async () => {await resetarDados(); setBioAtiva(false); Alert.alert("Dados Resetados!", "Dados biométricos apagados.");}}>
-                        <Text style={buttonStyles.ButtonText}>[DEV] Resetar Biometria</Text>
+                    onPress={async () => { await resetarDados(); setBioAtiva(false); Alert.alert("Dados Resetados!", "Dados biométricos apagados."); }}>
+                    <Text style={buttonStyles.ButtonText}>[DEV] Resetar Biometria</Text>
                 </Pressable>
 
                 {BioAtiva && (
@@ -169,16 +186,22 @@ export default function Login() {
 }
 
 const localStyles = StyleSheet.create({
+    backgroundImage: {
+        width: '100%',
+        height: 350,
+        position: 'absolute',
+        bottom: 0, // Posiciona a imagem colada no rodapé da tela
+    },
     logo: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 125,
+        marginTop: -25,
     },
     espacamento: {
         paddingHorizontal: 30,
     },
     input: {
-        padding: 10,
+        padding: 15,
         fontFamily: Font.regular,
         backgroundColor: Colors.AzulFundo,
         borderWidth: 2,
@@ -187,6 +210,6 @@ const localStyles = StyleSheet.create({
         marginTop: 5,
     },
     h2: {
-        marginTop: 15,
+        marginTop: 10,
     },
 });

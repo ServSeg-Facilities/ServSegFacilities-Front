@@ -3,15 +3,18 @@ import { Alert, Animated, Pressable, StyleSheet, Text, TextInput, View } from "r
 import { Colors, Font, H1, H2 } from "../../constants/theme";
 import Logo from '../../../assets/imgs/ServSeg Escuro.svg';
 import Biometria from '../../../assets/icons/Biometria.svg';
-import { styles as buttonStyles } from "./login.styles";
+import { styles as buttonStyles, styles } from "./login.styles";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "expo-router";
 import { useAuthLocal } from "../../hooks/useAuthLocal";
 
-// 1. Imagem fixa de fundo
+// 1. Nova imagem de fundo para a tela inteira
+const FULL_BACKGROUND = require('../../../assets/imgs/Fundo.png');
+
+// 2. Imagem fixa de fundo (rodapé)
 const BASE_BACKGROUND = require('../../../assets/imgs/FundoMapas.png');
 
-// 2. Apenas os mapas que vão alternar no carrossel
+// 3. Apenas os mapas que vão alternar no carrossel
 const MAP_IMAGES = [
     require('../../../assets/imgs/Mapa1.png'),
     require('../../../assets/imgs/Mapa2.png'),
@@ -105,7 +108,6 @@ export default function Login() {
         }
     }
 
-    // Loop do carrossel alterado para usar MAP_IMAGES
     useEffect(() => {
         const interval = setInterval(() => {
             Animated.timing(fadeAnim, {
@@ -125,15 +127,22 @@ export default function Login() {
     }, [fadeAnim]);
 
     return (
-        <View style={{ flex: 1, position: 'relative' }}>
-            {/* Imagem de Fundo Estática (Sempre Visível no Rodapé) */}
+        <View style={{ flex: 1, position: 'relative', backgroundColor: Colors.AzulFundo }}>
+            {/* 1. Imagem de Fundo Geral (Com Opacidade Reduzida) */}
+            <Animated.Image
+                source={FULL_BACKGROUND}
+                style={localStyles.fullBackgroundImage}
+                resizeMode="cover"
+            />
+
+            {/* 2. Imagem de Fundo Estática do Rodapé */}
             <Animated.Image
                 source={BASE_BACKGROUND}
                 style={localStyles.backgroundImage}
                 resizeMode="cover"
             />
 
-            {/* Imagem do Carrossel Alternante (Sobrepõe o Fundo com Fade) */}
+            {/* 3. Imagem do Carrossel Alternante */}
             <Animated.Image
                 source={MAP_IMAGES[currentImageIndex]}
                 style={[localStyles.backgroundImage, { opacity: fadeAnim }]}
@@ -168,15 +177,9 @@ export default function Login() {
                     onPress={acessar}>
                     <Text style={buttonStyles.ButtonText}>Entrar</Text>
                 </Pressable>
-                
-                <Pressable
-                    style={({ pressed }) => [buttonStyles.button, pressed && buttonStyles.buttonPressed]}
-                    onPress={async () => { await resetarDados(); setBioAtiva(false); Alert.alert("Dados Resetados!", "Dados biométricos apagados."); }}>
-                    <Text style={buttonStyles.ButtonText}>[DEV] Resetar Biometria</Text>
-                </Pressable>
 
                 {BioAtiva && (
-                    <Pressable onPress={handleLoginBiometrico} style={{ marginTop: -20 }}>
+                    <Pressable onPress={handleLoginBiometrico} style={styles.bioContainer}>
                         <Biometria width={80} style={{ alignSelf: 'center' }} />
                     </Pressable>
                 )}
@@ -186,11 +189,19 @@ export default function Login() {
 }
 
 const localStyles = StyleSheet.create({
+    fullBackgroundImage: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        opacity: 0.1,
+    },
     backgroundImage: {
         width: '100%',
         height: 350,
         position: 'absolute',
-        bottom: 0, // Posiciona a imagem colada no rodapé da tela
+        bottom: 0,
     },
     logo: {
         justifyContent: 'center',

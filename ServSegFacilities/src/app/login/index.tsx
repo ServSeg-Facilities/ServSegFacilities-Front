@@ -195,7 +195,7 @@ const localStyles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         left: 0,
-        opacity: 0.2,
+        opacity: 0.1,
     },
     backgroundImage: {
         width: '100%',
@@ -214,7 +214,7 @@ const localStyles = StyleSheet.create({
     input: {
         padding: 15,
         fontFamily: Font.regular,
-        backgroundColor: Colors.AzulFundo,
+        backgroundColor: 'transparent',
         borderWidth: 2,
         borderRadius: 10,
         borderColor: Colors.AzulTexto,

@@ -5,6 +5,8 @@ import { Colors } from "../../constants/theme";
 import MapView, { Marker } from "react-native-maps";
 import { DetalhesRegistro } from "../../@types/detalhesRegistro";
 
+// Recebe os detalhes já organizados pelo hook.
+// O componente não faz requisição para a API.
 interface CardDetalheProps {
   detalhes: DetalhesRegistro;
 }
@@ -16,7 +18,7 @@ export default function CardDetalhe({ detalhes }: CardDetalheProps) {
         <View style={styles.informacao}>
           <View style={styles.titulo}>
             <Feather name="user" size={18} color={Colors.AzulTexto} />
-
+             {/* Nome do funcionário */}
             <Text style={styles.texto}>Identificação:</Text>
           </View>
 
@@ -28,7 +30,7 @@ export default function CardDetalhe({ detalhes }: CardDetalheProps) {
         <View style={styles.informacao}>
           <View style={styles.titulo}>
             <Octicons name="organization" size={18} color={Colors.AzulTexto} />
-
+            {/* Nome empresa */}
             <Text style={styles.texto}>Empresa:</Text>
           </View>
 
@@ -38,6 +40,9 @@ export default function CardDetalhe({ detalhes }: CardDetalheProps) {
         </View>
       </View>
 
+      {/* ===========
+      ENTRADA E SAÍDA
+      =============== */}
       <View style={styles.gridHorarios}>
         <View style={styles.colunaHorario}>
           <View style={styles.titulo}>

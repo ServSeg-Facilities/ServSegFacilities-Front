@@ -195,7 +195,7 @@ const localStyles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         left: 0,
-        opacity: 0.1,
+        opacity: 0.2,
     },
     backgroundImage: {
         width: '100%',

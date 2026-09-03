@@ -1,16 +1,15 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Colors } from "../constants/theme";
-
-//* NOVO: Importe o seu AuthProvider (ajuste o caminho se necessário)
 import { AuthProvider } from "../contexts/AuthContext";
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      {/* //* NOVO: Envolvendo a navegação com o AuthProvider */}
       <AuthProvider>
         <Stack
+          // 1. ADICIONADO: Define qual rota abre primeiro
+          initialRouteName="splash/index"
           screenOptions={{
             headerShown: false,
             animation: "simple_push",
@@ -19,6 +18,7 @@ export default function RootLayout() {
             },
           }}
         >
+          <Stack.Screen name="splash/index" />
           <Stack.Screen name="login/index" />
           <Stack.Screen name="listaRegistro/index" />
           <Stack.Screen name="registrarPonto/index" />

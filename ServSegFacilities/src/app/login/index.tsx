@@ -184,6 +184,9 @@ export default function Login() {
                     </Pressable>
                 )}
             </View>
+            <Pressable onPress={ativarBiometria}>
+                <Text>Biometria.com</Text>
+            </Pressable>
         </View>
     );
 }

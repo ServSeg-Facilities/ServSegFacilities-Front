@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { Colors, Container, H1, Button, ButtonText, P, H2 } from "../../constants/theme";
+import { Colors, Container, H1, Button, H2 } from "../../constants/theme";
 
 export const styles = StyleSheet.create({
     safeArea: {
@@ -37,6 +37,8 @@ export const styles = StyleSheet.create({
         backgroundColor: 'none',
         paddingHorizontal: 20,
         paddingTop: 25,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
       titulo:{
@@ -45,5 +47,10 @@ export const styles = StyleSheet.create({
         marginVertical: 20,
         marginHorizontal: 20
     },
+
+    botaoTentarNovamente:{
+        ...Button,
+        color: Colors.AzulFundo
+    }
 
 })

@@ -22,7 +22,14 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "package": "com.anonymous.ServSegFacilities"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,7 +37,20 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "FaceIdPermission": "Permitir que o ServSegFacilities acesse o seu Face ID para autenticacao segura."
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Permitir que o ServSegFacilities acesse seus dados biometricos do Face ID"
+        }
+      ]
     ]
   }
 }

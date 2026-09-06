@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, StatusBar } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors, H1 } from "../../constants/theme";
 
@@ -16,14 +16,14 @@ export const Header: React.FC<HeaderProps> = ({
   onPressBack,
   mostrarBotaoVoltar = true,
 }) => {
-  const navigation = useNavigation();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const handleVoltar = () => {
     if (onPressBack) {
       onPressBack();
-    } else if (navigation.canGoBack()) {
-      navigation.goBack();
+    } else if (router.canGoBack()) {
+      router.back();
     }
   };
 

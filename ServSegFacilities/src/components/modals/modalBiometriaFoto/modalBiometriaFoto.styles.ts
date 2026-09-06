@@ -3,14 +3,13 @@ import { Colors, H1, Button, P } from "../../../constants/theme";
 
 export const styles = StyleSheet.create({
   icone:{
-    width:250,
-    height: 250
+    width:225,
+    height: 225
   },
 
     texto: {
       marginVertical: 30,
-      marginBottom: 40,
-      gap: 40
+      gap: 25
 
   },
 

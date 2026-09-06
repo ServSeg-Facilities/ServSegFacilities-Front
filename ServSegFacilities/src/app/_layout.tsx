@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Colors } from "../constants/theme";
+import { AuthProvider } from "../contexts/AuthContext";
 import {
   useFonts,
   StackSansNotch_400Regular,
@@ -21,25 +22,24 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-  <AuthProvider>
-    <Stack
-      // 1. ADICIONADO: Define qual rota abre primeiro
-      initialRouteName="splash/index"
-      screenOptions={{
-        headerShown: false,
-        animation: "simple_push",
-        contentStyle: {
-          backgroundColor: Colors.AzulFundo,
-        },
-      }}
-    >
-      <Stack.Screen name="splash/index" />
-      <Stack.Screen name="login/index" />
-      <Stack.Screen name="listaRegistro/index" />
-      <Stack.Screen name="registrarPonto/index" />
-      <Stack.Screen name="detalhesRegistro/index" />
-    </Stack>
-  </AuthProvider>
-    </SafeAreaProvider >
+      <AuthProvider>
+        <Stack
+          initialRouteName="splash/index"
+          screenOptions={{
+            headerShown: false,
+            animation: "simple_push",
+            contentStyle: {
+              backgroundColor: Colors.AzulFundo,
+            },
+          }}
+        >
+          <Stack.Screen name="splash/index" />
+          <Stack.Screen name="login/index" />
+          <Stack.Screen name="listaRegistro/index" />
+          <Stack.Screen name="registrarPonto/index" />
+          <Stack.Screen name="detalhesRegistro/index" />
+        </Stack>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

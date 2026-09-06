@@ -6,6 +6,7 @@ import { Colors } from "../../constants/theme";
 import { styles } from "./detalhesRegistro";
 import CardDetalhe from "../../components/cardDetalhes/cardDetalhes";
 import { useDetalhesRegistro } from "../../hooks/useDetalhesRegistro";
+import {Header} from "../../components/header/header"
 
 export default function DetalhesRegistro() {
   const router = useRouter();
@@ -25,19 +26,10 @@ export default function DetalhesRegistro() {
     return (
       //Área segura para evitar sobreposição com status bar e outros elementos do sistema
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.conteudoHeader}
-            onPress={() => router.back()}
-          >
-            <AntDesign name="arrow-left" size={24} color={Colors.AzulFundo} />
-            <Text style={styles.divisorHeader}>|</Text>
-            <Text style={styles.tituloHeader}>Detalhes</Text>
-          </Pressable>
-        </View>
+       <Header titulo="Detalhes" />
         {/* 
         Durante o carregamento, detalhes ainda pode ser null.
-        Por isso usamos "..." como valor temporário.
+        Por isso usa "..." como valor temporário.
         */}
         <Text style={styles.titulo}>
           Detalhes {detalhes?.dataHoraPonto ?? "..."}
@@ -54,23 +46,14 @@ export default function DetalhesRegistro() {
   // ESTADO DE ERRO
   // ==============
   // Executado quando:
-  // - ocorreu algum erro na requisição/tratamento dos dados; ou
+  // - ocorreu algum erro na requisição/tratamento dos dados;
   // - não foi encontrado um registro para a data solicitada.
   if (error || !detalhes) {
     return (
       //Área segura para evitar sobreposição com status bar e outros elementos do sistema
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <Pressable
-            style={styles.conteudoHeader}
-            onPress={() => router.back()}
-          >
-            <AntDesign name="arrow-left" size={24} color={Colors.AzulFundo} />
-            <Text style={styles.divisorHeader}>|</Text>
-            <Text style={styles.tituloHeader}>Detalhes</Text>
-          </Pressable>
-        </View>
-
+        <Header titulo="Detalhes" />
+        
         <View style={styles.container}>
           <Text style={styles.titulo}>
             {error || "Registro não encontrado."}
@@ -95,19 +78,11 @@ export default function DetalhesRegistro() {
   }
 
 // ============================
-// PROCESSAMENTO DE INFOMRAÇÕES
+// PROCESSAMENTO DE INFORMAÇÕES
 // ============================
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Pressable style={styles.conteudoHeader} onPress={() => router.back()}>
-          <AntDesign name="arrow-left" size={24} color={Colors.AzulFundo} />
-
-          <Text style={styles.divisorHeader}>|</Text>
-
-          <Text style={styles.tituloHeader}>Detalhes</Text>
-        </Pressable>
-      </View>
+      <Header titulo="Detalhes" />
 
       <Text style={styles.titulo}>Detalhes {detalhes.dataHoraPonto}:</Text>
 

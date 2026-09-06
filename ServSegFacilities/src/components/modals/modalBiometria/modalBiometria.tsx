@@ -1,29 +1,22 @@
-import { Text, Pressable, View, StyleSheet } from "react-native";
+import { Text, Pressable, View, ScrollView } from "react-native";
 import { styles } from "./modalBiometria.styles";
 import ModalBase from "../modalBase/modalBase";
 import IconeBiometria from "../../../../assets/icons/Icone Biometria.svg";
 
-// import Logo from '../../../assets/imgs/ServSeg Escuro.svg';
-
-// <View style={styles.logo}>
-//                 <Logo width={150} />
-//                 <Text style={H1}>ServSeg Facilities</Text>
-//             </View>
-
 interface ModalBiometriaProps {
-  visivel: boolean;
-  onConfirmar: () => void;
-  onCancelar: () => void;
+  modalVisivel: boolean;
+  aceitarPermissão: () =>  void | Promise<void>;
+  negarPermissão: () =>  void | Promise<void>;
 }
 
 export default function ModalBiometria({
-  visivel,
-  onConfirmar,
-  onCancelar,
+  modalVisivel,
+  aceitarPermissão,
+  negarPermissão,
 }: ModalBiometriaProps) {
   return (
-    <ModalBase visivel={visivel} aoFechar={onCancelar}>
-      <IconeBiometria width={250} height={250} />
+    <ModalBase visivel={modalVisivel} aoFechar={negarPermissão}>
+      <IconeBiometria width={225} height={225}/>
       <View style={styles.texto}>
         <Text style={styles.titulo}>
           Habilitar Biometria e Biometria Facial?
@@ -34,10 +27,10 @@ export default function ModalBiometria({
         </Text>
       </View>
       <View style={styles.botoesContainer}>
-        <Pressable style={styles.botao} onPress={onCancelar}>
+        <Pressable style={styles.botao} onPress={negarPermissão}>
           <Text style={styles.textoBotao}>Agora Não</Text>
         </Pressable>
-        <Pressable style={styles.botao} onPress={onConfirmar}>
+        <Pressable style={styles.botao} onPress={aceitarPermissão}>
           <Text style={styles.textoBotao}>Habilitar</Text>
         </Pressable>
       </View>

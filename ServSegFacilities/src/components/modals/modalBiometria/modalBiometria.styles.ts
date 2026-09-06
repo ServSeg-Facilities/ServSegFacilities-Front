@@ -4,8 +4,7 @@ import { Colors, H1, Button, P } from "../../../constants/theme";
 export const styles = StyleSheet.create({
   texto: {
       marginVertical: 30,
-      marginBottom: 40,
-      gap: 40
+      gap: 25
   },
 
   titulo: {
@@ -27,7 +26,7 @@ export const styles = StyleSheet.create({
 
   botao: {
     ...Button,
-    width: "45%",
+    width: "40%",
   },
 
   textoBotao: {

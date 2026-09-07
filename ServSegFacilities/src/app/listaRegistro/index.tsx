@@ -1,12 +1,14 @@
-<<<<<<< HEAD
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, TextInput, Text, Pressable, FlatList } from 'react-native';
+import { View, StyleSheet, TextInput, Text, Pressable, FlatList, StatusBar } from 'react-native';
 import CardLista from '../../components/cardLista/cardLista';
 import FiltroIcon from '../../../assets/icons/cuida_filter-outline.svg';
-import { useLista } from '../../hooks/useLista';
 import { RegistroPonto } from '../../@types';
 import { ListaConvertida, ListaRecebida } from '../../@types/lista';
 import { listaService } from '../../services/listaService';
+import { useListaRegistroPonto } from '../../hooks/useLista';
+import { router } from 'expo-router';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors } from '../../constants/theme';
 
 // Função auxiliar fora do componente para formatar a data e hora
 const formatarDataHora = (dataIsoString: string) => {
@@ -34,21 +36,25 @@ const formatarDataHora = (dataIsoString: string) => {
 
 export default function ListaRegistro() {
   const [termoPesquisa, setTermoPesquisa] = useState('');
-  const { lista, loading, error } = useLista();
   const [listaRegistro, setListaRegistro] = useState<ListaConvertida[]>([]);
+  const insets = useSafeAreaInsets();
 
   async function carregarRegistros() {
     try {
       const resposta: ListaRecebida[] = await listaService.listarHistoricoPontos();
 
       const listaMapeada: ListaConvertida[] = resposta.map((item) => {
-        const { dataTratada, horaTratada } = formatarDataHora(item.DataHoraPonto);
-        const { DataHoraPonto, ...restoObjeto } = item;
+        const { dataTratada, horaTratada } = formatarDataHora(
+          item.dataHoraPonto
+        );
+        
+        const { dataHoraPonto, ...restoObjeto } = item;
 
         return {
           ...restoObjeto,
-          DataPonto: dataTratada,
-          HoraPonto: horaTratada,
+          dataHoraPonto: dataHoraPonto,
+          dataPonto: dataTratada,
+          horaPonto: horaTratada,
         };
       });
 
@@ -61,20 +67,20 @@ export default function ListaRegistro() {
   useEffect(() => {
     carregarRegistros();
   }, []);
-  
+
   // CORREÇÃO: O useMemo processa APENAS a filtragem do array de dados
   const registrosFiltrados = useMemo(() => {
     const apenasPrimeirasEntradas: { [data: string]: ListaConvertida } = {};
 
     // 1. Filtra a primeira entrada do dia
     listaRegistro.forEach((registro) => {
-      const data = registro.DataPonto;
+      const data = registro.dataPonto;
       const registroExistente = apenasPrimeirasEntradas[data];
 
       if (!registroExistente) {
         apenasPrimeirasEntradas[data] = registro;
       } else {
-        if (registro.HoraPonto < registroExistente.HoraPonto) {
+        if (registro.horaPonto < registroExistente.horaPonto) {
           apenasPrimeirasEntradas[data] = registro;
         }
       }
@@ -88,18 +94,23 @@ export default function ListaRegistro() {
 
     return listaApenasEntradas.filter((registro) => {
       return (
-        registro.NomeEmpresa.toLowerCase().includes(busca) ||
-        registro.DataPonto.toLowerCase().includes(busca) ||
-        registro.HoraPonto.includes(busca)
+        registro.nomeEmpresa.toLowerCase().includes(busca) ||
+        registro.dataPonto.toLowerCase().includes(busca) ||
+        registro.horaPonto.includes(busca)
       );
     });
   }, [listaRegistro, termoPesquisa]); // Fechamento correto do useMemo
 
   // O return do layout visual JSX fica isolado aqui na raiz do componente
   return (
-    <View style={styles.container}>
-      <View style={styles.headerAzul}>
-        <View style={styles.paiInpHeader}>
+    <>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Colors.AzulHeader}
+      />
+
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <View style={styles.conteudoHeader}>
           <TextInput
             style={styles.input}
             placeholder="Pesquisar..."
@@ -111,31 +122,37 @@ export default function ListaRegistro() {
             <FiltroIcon width={40} height={40} />
           </Pressable>
         </View>
+
+        {/* Ponta que desce no canto inferior direito */}
+        <View style={styles.pontaDireita} />
       </View>
 
-      <View style={styles.containerBotao}>
-        <Pressable style={styles.botaoRegistro}>
-          <Text style={styles.textoBotao}>Registrar Novo Ponto</Text>
-        </Pressable>
-      </View>
+      <View style={styles.container}>
+        <View style={styles.containerBotao}>
+          <Pressable style={styles.botaoRegistro} onPress={() => router.push("/registrarPonto")}>
+            <Text style={styles.textoBotao}>Registrar Novo Ponto</Text>
+          </Pressable>
+        </View>
 
-      <FlatList
-        data={registrosFiltrados} // Alterado para renderizar a lista filtrada
-        keyExtractor={(item) => String(item.HistoricoId)}
-        renderItem={({ item }) => (
-          <CardLista
-            key={item.HistoricoId}
-            empresa={item.NomeEmpresa}
-            data={item.DataPonto}
-            horario={item.HoraPonto}
-          />
-        )}
-        contentContainerStyle={styles.componentesCards}
-        ListEmptyComponent={
-          <Text style={styles.textoVazio}>Nenhum registro de entrada encontrado.</Text>
-        }
-      />
-    </View>
+        <FlatList
+          data={registrosFiltrados} // Alterado para renderizar a lista filtrada
+          keyExtractor={(item) => String(item.registroPontoId)}
+          renderItem={({ item }) => (
+            <CardLista
+              key={item.registroPontoId}
+              empresa={item.nomeEmpresa}
+              dataHoraPonto={item.dataHoraPonto}
+              data={item.dataPonto}
+              horario={item.horaPonto}
+            />
+          )}
+          contentContainerStyle={styles.componentesCards}
+          ListEmptyComponent={
+            <Text style={styles.textoVazio}>Nenhum registro de entrada encontrado.</Text>
+          }q
+        />
+      </View>
+    </>
   );
 } // Fechamento correto da função do componente ListaRegistro
 
@@ -143,12 +160,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    backgroundColor: Colors.AzulHeader,
+    paddingTop: 10,
+    paddingBottom: 35,
+    justifyContent: "center",
+    borderBottomLeftRadius: 25,
+    paddingHorizontal: 20,
+    position: "relative",
+    marginBottom: 10,
+  },
+  conteudoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
   headerAzul: {
     width: '100%',
     height: 100,
     backgroundColor: '#007bff',
     alignItems: 'center',
-    justifyContent: 'space-evenly', 
+    justifyContent: 'space-evenly',
     flexDirection: 'row',
     borderBottomLeftRadius: 30,
   },
@@ -191,109 +223,23 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 20,
   },
+  pontaDireita: {
+    position: "absolute",
+    bottom: -30, // O quanto a ponta desce (igual à altura da borda superior)
+    right: 0,
+    width: 0,
+    height: 0,
+    backgroundColor: "transparent",
+    borderStyle: "solid",
+
+    // Define a largura e inclinação da ponta
+    borderLeftWidth: 50,  // Base esquerda do cone
+    borderRightWidth: 0,  // Alinha a borda direita reta com o final da tela
+
+    // Define a altura do cone e a cor
+    borderTopWidth: 35,   // Altura da ponta que desce
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: Colors.AzulHeader, // Cor do Header
+  },
 });
-=======
-import {
-  View,
-  Text,
-  Pressable,
-  ActivityIndicator,
-  FlatList,
-} from "react-native";
-
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { styles } from "./listaRegistro.styles";
-import { Colors } from "../../constants/theme";
-import { useListaRegistroPonto } from "../../hooks/useLista";
-
-export default function ListaRegistro() {
-  const router = useRouter();
-
-  const {
-    registros,
-    loading,
-    error,
-  } = useListaRegistroPonto();
-
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator
-          size="large"
-          color={Colors.AzulBotao}
-        />
-
-        <Text style={styles.titulo}>
-          Carregando registros...
-        </Text>
-      </SafeAreaView>
-    );
-  }
-
-  if (error) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <Text style={styles.titulo}>
-          {error}
-        </Text>
-      </SafeAreaView>
-    );
-  }
-
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <Text style={styles.titulo}>
-        Registros de ponto
-      </Text>
-
-      <FlatList
-        data={registros}
-        keyExtractor={(item) =>
-          item.historicoId.toString()
-        }
-        contentContainerStyle={styles.container}
-        renderItem={({ item }) => (
-          <Pressable
-            style={styles.card}
-            onPress={() => {
-              router.push({
-                pathname: "/detalhesRegistro",
-                params: {
-                  data: item.dataHoraPonto.split("T")[0],
-                },
-              });
-            }}
-          >
-            <Text style={styles.data}>
-              {formatarData(item.dataHoraPonto)}
-            </Text>
-
-            <Text style={styles.empresa}>
-              {item.nomeEmpresa}
-            </Text>
-
-            <Text style={styles.horario}>
-              {item.tipoRegistro}:{" "}
-              {formatarHorario(item.dataHoraPonto)}
-            </Text>
-          </Pressable>
-        )}
-      />
-    </SafeAreaView>
-  );
-}
-
-function formatarData(dataHora: string): string {
-  const [ano, mes, dia] = dataHora.split("T")[0].split("-");
-
-  return `${dia}/${mes}/${ano}`;
-}
-
-function formatarHorario(dataHora: string): string {
-  return new Date(dataHora).toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
->>>>>>> origin/merging

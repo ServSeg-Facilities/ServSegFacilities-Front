@@ -7,6 +7,7 @@ import {
   StackSansNotch_600SemiBold,
   StackSansNotch_700Bold,
 } from "@expo-google-fonts/stack-sans-notch";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -21,43 +22,25 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-<<<<<<< HEAD
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: "simple_push",
-          contentStyle: {
-            backgroundColor: Colors.AzulFundo,
-          },
-        }}
-      >
-        {/* <Stack.Screen name="login/index" /> */}
-        <Stack.Screen name="listaRegistro" />
-        {/* <Stack.Screen name="registrarPonto/index" /> */}
-        {/* <Stack.Screen name="detalhesRegistro/index" /> */}
-      </Stack>
-    </SafeAreaProvider>
-=======
-  <AuthProvider>
-    <Stack
-      // 1. ADICIONADO: Define qual rota abre primeiro
-      initialRouteName="splash/index"
-      screenOptions={{
-        headerShown: false,
-        animation: "simple_push",
-        contentStyle: {
-          backgroundColor: Colors.AzulFundo,
-        },
-      }}
-    >
-      <Stack.Screen name="splash/index" />
-      <Stack.Screen name="login/index" />
-      <Stack.Screen name="listaRegistro/index" />
-      <Stack.Screen name="registrarPonto/index" />
-      <Stack.Screen name="detalhesRegistro/index" />
-    </Stack>
-  </AuthProvider>
+      <AuthProvider>
+        <Stack
+          // 1. ADICIONADO: Define qual rota abre primeiro
+          initialRouteName="splash/index"
+          screenOptions={{
+            headerShown: false,
+            animation: "simple_push",
+            contentStyle: {
+              backgroundColor: Colors.AzulFundo,
+            },
+          }}
+        >
+          <Stack.Screen name="splash/index" />
+          <Stack.Screen name="login/index" />
+          <Stack.Screen name="listaRegistro/index" />
+          <Stack.Screen name="registrarPonto/index" />
+          <Stack.Screen name="detalhesRegistro/index" />
+        </Stack>
+      </AuthProvider>
     </SafeAreaProvider >
->>>>>>> origin/merging
   );
 }

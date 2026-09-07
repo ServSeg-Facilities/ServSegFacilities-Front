@@ -1,17 +1,26 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { styles } from './cardLista.styles';
+import { router } from 'expo-router';
 
 interface CardListaProps {
   empresa: string;
   horario: string;
   data: string;
+  dataHoraPonto: string;
 }
 
-export default function CardLista({ empresa, horario, data }: CardListaProps) {
+export default function CardLista({ empresa, horario, data, dataHoraPonto }: CardListaProps) {
   return (
-    <View style={styles.card}>
+    <Pressable
+      style={styles.card}
+      onPress={() => router.push({
+        pathname: "/detalhesRegistro",
+        params: {
+          data: dataHoraPonto
+        }
+      })}>
       <Text style={styles.dataTexto}>{data}</Text>
 
       <View style={styles.linhaInfo}>
@@ -25,6 +34,6 @@ export default function CardLista({ empresa, horario, data }: CardListaProps) {
         <MaterialCommunityIcons name="login" size={20} color="#183059" />
         <Text style={styles.infoTexto}>{horario}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }

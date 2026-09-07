@@ -1,66 +1,98 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, TextInput, Text, Pressable, FlatList, StatusBar } from 'react-native';
-import CardLista from '../../components/cardLista/cardLista';
-import FiltroIcon from '../../../assets/icons/cuida_filter-outline.svg';
-import { RegistroPonto } from '../../@types';
-import { ListaConvertida, ListaRecebida } from '../../@types/lista';
-import { listaService } from '../../services/listaService';
-import { useListaRegistroPonto } from '../../hooks/useLista';
-import { router } from 'expo-router';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '../../constants/theme';
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  Text,
+  Pressable,
+  FlatList,
+  StatusBar,
+} from "react-native";
 
-// Função auxiliar fora do componente para formatar a data e hora
+import CardLista from "../../components/cardLista/cardLista";
+import FiltroIcon from "../../../assets/icons/cuida_filter-outline.svg";
+
+import { ListaConvertida, ListaRecebida } from "../../@types/lista";
+import { listaService } from "../../services/listaService";
+
+import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from "../../constants/theme";
+
 const formatarDataHora = (dataIsoString: string) => {
   const dataObjeto = new Date(dataIsoString);
 
-  // 1. Formata o dia da semana e a data (ex: quarta-feira, 12/08/2026)
-  const dataFormatadaBruta = dataObjeto.toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
+  const dataFormatadaBruta = dataObjeto.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   });
 
-  // 2. Coloca a primeira letra do dia da semana em Maiúsculo
-  const dataTratada = dataFormatadaBruta.charAt(0).toUpperCase() + dataFormatadaBruta.slice(1);
+  const dataTratada =
+    dataFormatadaBruta.charAt(0).toUpperCase() +
+    dataFormatadaBruta.slice(1);
 
-  // 3. Formata o horário (ex: 09:08)
-  const horaTratada = dataObjeto.toLocaleTimeString('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
+  const horaTratada = dataObjeto.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
-  return { dataTratada, horaTratada };
+  return {
+    dataTratada,
+    horaTratada,
+  };
 };
 
 export default function ListaRegistro() {
-  const [termoPesquisa, setTermoPesquisa] = useState('');
+  const [termoPesquisa, setTermoPesquisa] = useState("");
   const [listaRegistro, setListaRegistro] = useState<ListaConvertida[]>([]);
+
   const insets = useSafeAreaInsets();
 
   async function carregarRegistros() {
     try {
-      const resposta: ListaRecebida[] = await listaService.listarHistoricoPontos();
+      const resposta: ListaRecebida[] =
+        await listaService.listarHistoricoPontos();
 
       const listaMapeada: ListaConvertida[] = resposta.map((item) => {
-        const { dataTratada, horaTratada } = formatarDataHora(
-          item.dataHoraPonto
+        const entrada = formatarDataHora(
+          item.dataHoraPontoEntrada
         );
-        
-        const { dataHoraPonto, ...restoObjeto } = item;
+
+        const saida = item.dataHoraPontoSaida
+          ? formatarDataHora(item.dataHoraPontoSaida)
+          : null;
 
         return {
-          ...restoObjeto,
-          dataHoraPonto: dataHoraPonto,
-          dataPonto: dataTratada,
-          horaPonto: horaTratada,
+          historicoId: item.historicoId,
+
+          registroPontoEntradaId: item.registroPontoEntradaId,
+          registroPontoSaidaId: item.registroPontoSaidaId,
+
+          latitudeEntrada: item.latitudeEntrada,
+          latitudeSaida: item.latitudeSaida,
+
+          longitudeEntrada: item.longitudeEntrada,
+          longitudeSaida: item.longitudeSaida,
+
+          dataHoraPontoEntrada: item.dataHoraPontoEntrada,
+          dataHoraPontoSaida: item.dataHoraPontoSaida,
+
+          dataPontoEntrada: entrada.dataTratada,
+          dataPontoSaida: saida?.dataTratada ?? null,
+
+          horaPontoEntrada: entrada.horaTratada,
+          horaPontoSaida: saida?.horaTratada ?? null,
+
+          nomeUsuario: item.nomeUsuario,
+          nomeEmpresa: item.nomeEmpresa,
         };
       });
 
       setListaRegistro(listaMapeada);
     } catch (err) {
-      console.error("Erro ao carregar e converter registros:", err);
+      console.error("Erro ao carregar histórico:", err);
     }
   }
 
@@ -68,40 +100,23 @@ export default function ListaRegistro() {
     carregarRegistros();
   }, []);
 
-  // CORREÇÃO: O useMemo processa APENAS a filtragem do array de dados
   const registrosFiltrados = useMemo(() => {
-    const apenasPrimeirasEntradas: { [data: string]: ListaConvertida } = {};
-
-    // 1. Filtra a primeira entrada do dia
-    listaRegistro.forEach((registro) => {
-      const data = registro.dataPonto;
-      const registroExistente = apenasPrimeirasEntradas[data];
-
-      if (!registroExistente) {
-        apenasPrimeirasEntradas[data] = registro;
-      } else {
-        if (registro.horaPonto < registroExistente.horaPonto) {
-          apenasPrimeirasEntradas[data] = registro;
-        }
-      }
-    });
-
-    const listaApenasEntradas = Object.values(apenasPrimeirasEntradas);
-
-    // 2. Filtra pelo termo de pesquisa
     const busca = termoPesquisa.toLowerCase().trim();
-    if (!busca) return listaApenasEntradas;
 
-    return listaApenasEntradas.filter((registro) => {
+    if (!busca) {
+      return listaRegistro;
+    }
+
+    return listaRegistro.filter((registro) => {
       return (
         registro.nomeEmpresa.toLowerCase().includes(busca) ||
-        registro.dataPonto.toLowerCase().includes(busca) ||
-        registro.horaPonto.includes(busca)
+        registro.dataPontoEntrada.toLowerCase().includes(busca) ||
+        registro.horaPontoEntrada.includes(busca) ||
+        registro.horaPontoSaida?.includes(busca)
       );
     });
-  }, [listaRegistro, termoPesquisa]); // Fechamento correto do useMemo
+  }, [listaRegistro, termoPesquisa]);
 
-  // O return do layout visual JSX fica isolado aqui na raiz do componente
   return (
     <>
       <StatusBar
@@ -109,7 +124,14 @@ export default function ListaRegistro() {
         backgroundColor={Colors.AzulHeader}
       />
 
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + 10,
+          },
+        ]}
+      >
         <View style={styles.conteudoHeader}>
           <TextInput
             style={styles.input}
@@ -118,48 +140,56 @@ export default function ListaRegistro() {
             value={termoPesquisa}
             onChangeText={setTermoPesquisa}
           />
+
           <Pressable style={styles.botaoFiltro}>
             <FiltroIcon width={40} height={40} />
           </Pressable>
         </View>
 
-        {/* Ponta que desce no canto inferior direito */}
         <View style={styles.pontaDireita} />
       </View>
 
       <View style={styles.container}>
         <View style={styles.containerBotao}>
-          <Pressable style={styles.botaoRegistro} onPress={() => router.push("/registrarPonto")}>
-            <Text style={styles.textoBotao}>Registrar Novo Ponto</Text>
+          <Pressable
+            style={styles.botaoRegistro}
+            onPress={() => router.push("/registrarPonto")}
+          >
+            <Text style={styles.textoBotao}>
+              Registrar Novo Ponto
+            </Text>
           </Pressable>
         </View>
 
         <FlatList
-          data={registrosFiltrados} // Alterado para renderizar a lista filtrada
-          keyExtractor={(item) => String(item.registroPontoId)}
+          data={registrosFiltrados}
+          keyExtractor={(item) => String(item.historicoId)}
           renderItem={({ item }) => (
             <CardLista
-              key={item.registroPontoId}
+              historicoId={item.historicoId}
               empresa={item.nomeEmpresa}
-              dataHoraPonto={item.dataHoraPonto}
-              data={item.dataPonto}
-              horario={item.horaPonto}
+              data={item.dataPontoEntrada}
+              horaEntrada={item.horaPontoEntrada}
+              horaSaida={item.horaPontoSaida}
             />
           )}
           contentContainerStyle={styles.componentesCards}
           ListEmptyComponent={
-            <Text style={styles.textoVazio}>Nenhum registro de entrada encontrado.</Text>
-          }q
+            <Text style={styles.textoVazio}>
+              Nenhum registro de entrada encontrado.
+            </Text>
+          }
         />
       </View>
     </>
   );
-} // Fechamento correto da função do componente ListaRegistro
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
   header: {
     backgroundColor: Colors.AzulHeader,
     paddingTop: 10,
@@ -170,76 +200,83 @@ const styles = StyleSheet.create({
     position: "relative",
     marginBottom: 10,
   },
+
   conteudoHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
   },
+
   headerAzul: {
-    width: '100%',
+    width: "100%",
     height: 100,
-    backgroundColor: '#007bff',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-    flexDirection: 'row',
+    backgroundColor: "#007bff",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    flexDirection: "row",
     borderBottomLeftRadius: 30,
   },
+
   paiInpHeader: {
-    width: '90%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    width: "90%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
+
   input: {
     padding: 10,
-    width: '80%',
+    width: "80%",
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: 'white',
-    color: 'white',
+    borderColor: "white",
+    color: "white",
   },
+
   botaoFiltro: {
     height: 40,
   },
+
   containerBotao: {
     padding: 20,
   },
+
   botaoRegistro: {
-    backgroundColor: '#113E82',
-    alignItems: 'center',
+    backgroundColor: "#113E82",
+    alignItems: "center",
     padding: 10,
     borderRadius: 10,
   },
+
   textoBotao: {
-    color: 'white',
+    color: "white",
     fontSize: 20,
   },
+
   componentesCards: {
     padding: 20,
     gap: 12,
   },
+
   textoVazio: {
-    textAlign: 'center',
-    color: '#666',
+    textAlign: "center",
+    color: "#666",
     marginTop: 20,
   },
+
   pontaDireita: {
     position: "absolute",
-    bottom: -30, // O quanto a ponta desce (igual à altura da borda superior)
+    bottom: -30,
     right: 0,
     width: 0,
     height: 0,
     backgroundColor: "transparent",
     borderStyle: "solid",
-
-    // Define a largura e inclinação da ponta
-    borderLeftWidth: 50,  // Base esquerda do cone
-    borderRightWidth: 0,  // Alinha a borda direita reta com o final da tela
-
-    // Define a altura do cone e a cor
-    borderTopWidth: 35,   // Altura da ponta que desce
+    borderLeftWidth: 50,
+    borderRightWidth: 0,
+    borderTopWidth: 35,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: Colors.AzulHeader, // Cor do Header
+    borderTopColor: Colors.AzulHeader,
   },
 });

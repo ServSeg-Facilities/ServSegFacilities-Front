@@ -6,7 +6,7 @@ import { api } from "./api";
 //
 export const listaService = {
     async listarHistoricoPontos(): Promise<ListaRecebida[]> {
-        const response = await api.get<ListaRecebida[]>("RegistroPonto/ObterPorUsuario")
+        const response = await api.get<ListaRecebida[]>("HistoricoRegistroPonto")
         return response.data;
     },
 

@@ -1,27 +1,43 @@
-export interface ListaRecebida { //int e double = mumber
-    registroPontoId: number;
-    nomeUsuario: string;
-    nomeEmpresa: string;
-    tipoRegistro: string;
-    latitude: number;
-    longitude: number;
-    dataHoraPonto: string;
-    statusRegistroPonto: boolean;
-    tipoRegistroId: number;
-}
-//Molde dos dados da api
+export interface ListaRecebida {
+  historicoId: number;
 
-export interface ListaConvertida { //int e double = mumber
-    registroPontoId: number;
-    nomeUsuario: string;
-    nomeEmpresa: string;
-    tipoRegistro: string;
-    latitude: number;
-    longitude: number;
-    dataHoraPonto: string;
-    dataPonto: string;
-    horaPonto: string;
-    statusRegistroPonto: boolean;
-    tipoRegistroId: number;
+  registroPontoEntradaId: number;
+  registroPontoSaidaId: number | null;
+
+  dataHoraPontoEntrada: string;
+  dataHoraPontoSaida: string | null;
+
+  latitudeEntrada: number;
+  latitudeSaida: number | null;
+
+  longitudeEntrada: number;
+  longitudeSaida: number | null;
+
+  nomeUsuario: string;
+  nomeEmpresa: string;
 }
-//Molde dos dados da api
+
+export interface ListaConvertida {
+  historicoId: number;
+
+  registroPontoEntradaId: number;
+  registroPontoSaidaId: number | null;
+
+  latitudeEntrada: number;
+  latitudeSaida: number | null;
+
+  longitudeEntrada: number;
+  longitudeSaida: number | null;
+
+  dataHoraPontoEntrada: string;
+  dataHoraPontoSaida: string | null;
+
+  dataPontoEntrada: string;
+  dataPontoSaida: string | null;
+
+  horaPontoEntrada: string;
+  horaPontoSaida: string | null;
+
+  nomeUsuario: string;
+  nomeEmpresa: string;
+}

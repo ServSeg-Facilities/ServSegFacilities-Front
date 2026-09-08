@@ -6,6 +6,7 @@ import {
 } from "@expo/vector-icons";
 import { styles } from "./cardLista.styles";
 import { router } from "expo-router";
+import { Font } from "../../constants/theme";
 
 interface CardListaProps {
   historicoId: number;
@@ -34,7 +35,7 @@ export default function CardLista({
         })
       }
     >
-      <Text style={styles.dataTexto}>
+      <Text style={[styles.dataTexto, { fontFamily: Font.bold }]}>
         {data}
       </Text>
 
@@ -45,7 +46,7 @@ export default function CardLista({
           color="#183059"
         />
 
-        <Text style={styles.infoTexto}>
+        <Text style={[styles.infoTexto, { fontFamily: Font.regular }]}>
           {empresa}
         </Text>
       </View>
@@ -58,7 +59,7 @@ export default function CardLista({
             color="#183059"
           />
 
-          <Text style={styles.infoTexto}>
+          <Text style={[styles.infoTexto, { fontFamily: Font.regular }]}>
             {horaEntrada}
           </Text>
         </View>
@@ -71,7 +72,7 @@ export default function CardLista({
               color="#183059"
             />
 
-            <Text style={styles.infoTexto}>
+            <Text style={[styles.infoTexto, { fontFamily: Font.regular }]}>
               {horaSaida}
             </Text>
           </View>

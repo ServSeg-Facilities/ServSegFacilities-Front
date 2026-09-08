@@ -11,6 +11,15 @@ export const styles = StyleSheet.create({
     backgroundColor: 'none',
     paddingHorizontal: 20,
     paddingTop: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   titulo: {
@@ -65,21 +74,47 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 25,
     marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   data: {
     ...P,
     color: Colors.AzulTexto,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   horario: {
     ...P,
-    color: Colors.AzulTexto,
+    color: Colors.AzulFundo,
     backgroundColor: Colors.AzulHeader,
     paddingHorizontal: 25,
     paddingVertical: 8,
     borderRadius: 5,
-    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   mapa: {
@@ -91,6 +126,15 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   map: {
@@ -115,6 +159,15 @@ export const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 5,
     marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   ButtonText,

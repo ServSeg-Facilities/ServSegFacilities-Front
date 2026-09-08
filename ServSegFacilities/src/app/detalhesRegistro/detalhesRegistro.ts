@@ -40,6 +40,15 @@ export const styles = StyleSheet.create({
     paddingTop: 25,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   titulo: {
@@ -52,5 +61,14 @@ export const styles = StyleSheet.create({
   botaoTentarNovamente: {
     ...Button,
     color: Colors.AzulFundo,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 });

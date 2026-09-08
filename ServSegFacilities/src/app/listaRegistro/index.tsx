@@ -18,7 +18,7 @@ import { listaService } from "../../services/listaService";
 
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "../../constants/theme";
+import { Colors, Font } from "../../constants/theme"; // <--- Importado a constante Font
 
 // Import da imagem de fundo
 const FULL_BACKGROUND = require("../../../assets/imgs/Fundo2.png");
@@ -60,9 +60,7 @@ export default function ListaRegistro() {
         await listaService.listarHistoricoPontos();
 
       const listaMapeada: ListaConvertida[] = resposta.map((item) => {
-        const entrada = formatarDataHora(
-          item.dataHoraPontoEntrada
-        );
+        const entrada = formatarDataHora(item.dataHoraPontoEntrada);
 
         const saida = item.dataHoraPontoSaida
           ? formatarDataHora(item.dataHoraPontoSaida)
@@ -128,7 +126,6 @@ export default function ListaRegistro() {
         backgroundColor={Colors.AzulHeader}
       />
 
-      {/* Imagem de Fundo em camada absoluta */}
       <Image
         source={FULL_BACKGROUND}
         style={localStyles.fullBackgroundImage}
@@ -233,50 +230,46 @@ const styles = StyleSheet.create({
     gap: 5,
   },
 
-  headerAzul: {
-    width: "100%",
-    height: 100,
-    backgroundColor: "#007bff",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-    flexDirection: "row",
-    borderBottomLeftRadius: 30,
-  },
-
-  paiInpHeader: {
-    width: "90%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
   input: {
-    padding: 10,
+    paddingHorizontal: 10,
     width: "80%",
     borderRadius: 10,
     borderWidth: 2,
     borderColor: "white",
     color: "white",
+    marginTop: 5,
+    fontFamily: Font.regular, // <--- Aplicado a fonte no input
   },
 
   botaoFiltro: {
-    height: 40,
+    marginLeft: 20,
+    height: 30,
   },
 
   containerBotao: {
-    padding: 20,
+    padding: 30,
   },
 
   botaoRegistro: {
-    backgroundColor: "#113E82",
+    backgroundColor: Colors.AzulBotao,
     alignItems: "center",
     padding: 10,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   textoBotao: {
-    color: "white",
-    fontSize: 20,
+    color: Colors.AzulFundo,
+    fontSize: 25,
+    fontFamily: Font.regular, // <--- Aplicado a fonte em negrito
   },
 
   componentesCards: {
@@ -286,8 +279,9 @@ const styles = StyleSheet.create({
 
   textoVazio: {
     textAlign: "center",
-    color: "#666",
-    marginTop: 20,
+    color: "#555",
+    marginTop: 0,
+    fontFamily: Font.regular, // <--- Aplicado a fonte no texto de lista vazia
   },
 
   pontaDireita: {

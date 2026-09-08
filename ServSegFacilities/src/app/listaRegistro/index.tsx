@@ -110,10 +110,10 @@ export default function ListaRegistro() {
     }
 
     return listaRegistro.filter((registro) => {
-      return (
-        registro.nomeEmpresa.toLowerCase().includes(busca) ||
-        registro.dataPontoEntrada.toLowerCase().includes(busca) ||
-        registro.horaPontoEntrada.includes(busca) ||
+      return Boolean(
+        registro.nomeEmpresa?.toLowerCase().includes(busca) ||
+        registro.dataPontoEntrada?.toLowerCase().includes(busca) ||
+        registro.horaPontoEntrada?.includes(busca) ||
         registro.horaPontoSaida?.includes(busca)
       );
     });

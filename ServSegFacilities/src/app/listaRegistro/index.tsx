@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import {
   View,
   TextInput,
@@ -8,23 +8,29 @@ import {
   StatusBar,
   Image,
 } from "react-native";
+import { useFocusEffect, router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import CardLista from "../../components/cardLista/cardLista";
 import FiltroIcon from "../../../assets/icons/cuida_filter-outline.svg";
 
 import { ListaConvertida, ListaRecebida } from "../../@types/lista";
 import { listaService } from "../../services/listaService";
-
-import { router } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "../../constants/theme";
 import { localStyles } from "./listaRegistro.styles";
 
 // Import da imagem de fundo
 const FULL_BACKGROUND = require("../../../assets/imgs/Fundo2.png");
 
-const formatarDataHora = (dataIsoString: string) => {
+const formatarDataHora = (dataIsoString?: string | null) => {
+  if (!dataIsoString) return { dataTratada: "", horaTratada: "" };
+
   const dataObjeto = new Date(dataIsoString);
+
+  // Tratamento contra datas inválidas retornadas pelo servidor
+  if (isNaN(dataObjeto.getTime())) {
+    return { dataTratada: "", horaTratada: "" };
+  }
 
   const dataFormatadaBruta = dataObjeto.toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -51,13 +57,20 @@ const formatarDataHora = (dataIsoString: string) => {
 export default function ListaRegistro() {
   const [termoPesquisa, setTermoPesquisa] = useState("");
   const [listaRegistro, setListaRegistro] = useState<ListaConvertida[]>([]);
+  const [carregando, setCarregando] = useState(false);
 
   const insets = useSafeAreaInsets();
 
   async function carregarRegistros() {
     try {
+      setCarregando(true);
       const resposta: ListaRecebida[] =
         await listaService.listarHistoricoPontos();
+
+      if (!Array.isArray(resposta)) {
+        setListaRegistro([]);
+        return;
+      }
 
       const listaMapeada: ListaConvertida[] = resposta.map((item) => {
         const entrada = formatarDataHora(item.dataHoraPontoEntrada);
@@ -95,12 +108,17 @@ export default function ListaRegistro() {
       setListaRegistro(listaMapeada);
     } catch (err) {
       console.error("Erro ao carregar histórico:", err);
+    } finally {
+      setCarregando(false);
     }
   }
 
-  useEffect(() => {
-    carregarRegistros();
-  }, []);
+  // Executa toda vez que a tela ganha foco no App (ao abrir ou voltar de outra tela)
+  useFocusEffect(
+    useCallback(() => {
+      carregarRegistros();
+    }, [])
+  );
 
   const registrosFiltrados = useMemo(() => {
     const busca = termoPesquisa.toLowerCase().trim();
@@ -171,7 +189,13 @@ export default function ListaRegistro() {
 
         <FlatList
           data={registrosFiltrados}
-          keyExtractor={(item) => String(item.historicoId)}
+          keyExtractor={(item, index) =>
+            item.historicoId
+              ? String(item.historicoId)
+              : `registro-${index}`
+          }
+          refreshing={carregando}
+          onRefresh={carregarRegistros}
           renderItem={({ item }) => (
             <CardLista
               historicoId={item.historicoId}
@@ -184,7 +208,9 @@ export default function ListaRegistro() {
           contentContainerStyle={localStyles.componentesCards}
           ListEmptyComponent={
             <Text style={localStyles.textoVazio}>
-              Nenhum registro de entrada encontrado.
+              {carregando
+                ? "Carregando registros..."
+                : "Nenhum registro encontrado."}
             </Text>
           }
         />

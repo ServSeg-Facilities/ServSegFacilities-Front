@@ -3,19 +3,10 @@ import { DetalhesRegistroService } from "../services/detalhesRegistroService";
 import { ListaConvertida } from "../@types/lista";
 
 export function useDetalhesRegistro(historicoId: string) {
-  // ============================================================
-  // ESTADOS -> Guarda os dados já organzizados para a tela
-  // ============================================================
-  // Enquanto a API não retornar, o valor é null.
   const [detalhes, setDetalhes] = useState<ListaConvertida | null>(null);
-  // Controla o carregamento da API.
   const [loading, setLoading] = useState(true);
-  // Guarda uma mensagem de erro, caso aconteça.
   const [error, setError] = useState<string | null>(null);
 
-  // =============================
-  // BUSCA E ORGANIZAÇÃO DOS DADOS
-  // =============================
   async function carregarDetalhesRegistro() {
     console.log("======================================");
     console.log("🔎 INÍCIO - carregarDetalhesRegistro");
@@ -24,7 +15,6 @@ export function useDetalhesRegistro(historicoId: string) {
 
     if (!historicoId) {
       console.log("❌ historicoId NÃO informado");
-
       setLoading(false);
       setError("Histórico do registro não informado.");
       return;
@@ -35,15 +25,17 @@ export function useDetalhesRegistro(historicoId: string) {
       setError(null);
 
       console.log("🌐 Chamando buscarHistoricoId...");
-      console.log("🌐 historicoId enviado:", historicoId);
+      const respostaService = await DetalhesRegistroService.buscarHistoricoId(historicoId);
 
-      const historicoLista =
-        await DetalhesRegistroService.buscarHistoricoId(historicoId);
-
-        const historico = historicoLista[0];
+      // Trata se a API retornar array [ {...} ] ou objeto direto { ... }
+      const historico = Array.isArray(respostaService) ? respostaService[0] : respostaService;
 
       console.log("✅ buscarHistoricoId respondeu!");
       console.log("📦 historico recebido:", historico);
+
+      if (!historico) {
+        throw new Error("Registro de histórico não encontrado na resposta.");
+      }
 
       const detalhesConvertidos: ListaConvertida = {
         historicoId: historico.historicoId,
@@ -56,17 +48,17 @@ export function useDetalhesRegistro(historicoId: string) {
         longitudeEntrada: historico.longitudeEntrada,
         longitudeSaida: historico.longitudeSaida,
 
-        dataPontoEntrada: formatarData(
-          historico.dataHoraPontoEntrada
-        ),
+        dataPontoEntrada: historico.dataHoraPontoEntrada
+          ? formatarData(historico.dataHoraPontoEntrada)
+          : "-",
 
         dataPontoSaida: historico.dataHoraPontoSaida
           ? formatarData(historico.dataHoraPontoSaida)
           : null,
 
-        horaPontoEntrada: formatarHorario(
-          historico.dataHoraPontoEntrada
-        ),
+        horaPontoEntrada: historico.dataHoraPontoEntrada
+          ? formatarHorario(historico.dataHoraPontoEntrada)
+          : "-",
 
         horaPontoSaida: historico.dataHoraPontoSaida
           ? formatarHorario(historico.dataHoraPontoSaida)
@@ -76,25 +68,17 @@ export function useDetalhesRegistro(historicoId: string) {
         nomeEmpresa: historico.nomeEmpresa,
       };
 
-      console.log("✅ detalhesConvertidos criado:");
-      console.log("📦 detalhesConvertidos:", detalhesConvertidos);
-
+      console.log("✅ detalhesConvertidos criado:", detalhesConvertidos);
       setDetalhes(detalhesConvertidos);
-
-      console.log("✅ setDetalhes executado");
     } catch (error: any) {
       console.log("======================================");
-      console.log("❌ ERRO NO carregarDetalhesRegistro");
-      console.log("❌ error:", error);
-      console.log("❌ message:", error?.message);
-      console.log("❌ response:", error?.response);
-      console.log("❌ status:", error?.response?.status);
-      console.log("❌ data:", error?.response?.data);
+      console.log("❌ ERRO NO carregarDetalhesRegistro:", error);
       console.log("======================================");
 
       const mensagem =
         error.response?.data?.message ??
         error.response?.data ??
+        error.message ??
         "Não foi possível carregar as informações do registro de ponto.";
 
       setError(
@@ -108,23 +92,12 @@ export function useDetalhesRegistro(historicoId: string) {
     }
   }
 
-  //Executa a busca quando a data mudar
   useEffect(() => {
     carregarDetalhesRegistro();
   }, [historicoId]);
 
-  //Retorno do hook
-  return {
-    detalhes,
-    loading,
-    error,
-    carregarDetalhesRegistro,
-  };
-
-  // ====================
-  // FORMATAÇÃO DATA/HORA
-  // ====================
   function formatarHorario(dataHora: string): string {
+    if (!dataHora) return "";
     return new Date(dataHora).toLocaleTimeString("pt-BR", {
       hour: "2-digit",
       minute: "2-digit",
@@ -132,8 +105,17 @@ export function useDetalhesRegistro(historicoId: string) {
   }
 
   function formatarData(dataHora: string): string {
-    const [ano, mes, dia] = dataHora.split("T")[0].split("-");
-
+    if (!dataHora) return "";
+    const partes = dataHora.split("T")[0].split("-");
+    if (partes.length < 3) return dataHora;
+    const [ano, mes, dia] = partes;
     return `${dia}/${mes}/${ano}`;
   }
+
+  return {
+    detalhes,
+    loading,
+    error,
+    carregarDetalhesRegistro,
+  };
 }

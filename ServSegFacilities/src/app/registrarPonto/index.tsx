@@ -10,22 +10,16 @@ import { api, getAuthToken } from "../../services/api";
 import { Header } from "../../components/header/header";
 import ModalBiometriaFoto from "../../components/modals/modalBiometriaFoto/modalBiometriaFoto";
 
-// Importação da imagem de fundo igual à tela de Login
 const FULL_BACKGROUND = require("../../../assets/imgs/Fundo2.png");
 
-const DEFAULT_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQWRtaW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbkBzZXJ2c2VnLmNvbSIsImlzcyI6IlNlcnZTZWdBUEkiLCJhdWQiOiJTZXJ2U2VnQVBJIiwibmJmIjoxNzg4MTc0ODI1LCJleHAiOjE4MTk3MTA4MjV9.mPpkv87L0YSdnxgCe2pNJLDmFmKjHJfm6B6U7R4whRo";
-
-// Coordenada padrão (Praça da Sé - SP, sede da empresa cadastrada no banco)
+// Coordenada padrão (Praça da Sé - SP)
 const COORDENADA_EMPRESA_PADRAO = {
   latitude: -23.55052,
   longitude: -46.633309,
 };
 
 export default function RegistrarPonto() {
-  const [tipoRegistro, setTipoRegistro] = useState<"entrada" | "saida">(
-    "entrada"
-  );
+  const [tipoRegistro, setTipoRegistro] = useState<"entrada" | "saida">("entrada");
   const [localizacao, setLocalizacao] = useState<{
     latitude: number;
     longitude: number;
@@ -33,7 +27,10 @@ export default function RegistrarPonto() {
   const [dataHoraAtual, setDataHoraAtual] = useState(new Date());
   const [carregando, setCarregando] = useState(false);
 
-  // Atualização em tempo real do relógio
+  // Estado do modal de biometria
+  const [modalBiometriaFotoVisivel, setModalBiometriaFotoVisivel] = useState(false);
+
+  // Relógio em tempo real
   useEffect(() => {
     const timer = setInterval(() => {
       setDataHoraAtual(new Date());
@@ -42,7 +39,7 @@ export default function RegistrarPonto() {
     return () => clearInterval(timer);
   }, []);
 
-  // Obtenção da localização do usuário com fallback automático para emulador
+  // Obtenção da localização do usuário
   useEffect(() => {
     async function obterLocalizacao() {
       try {
@@ -66,7 +63,6 @@ export default function RegistrarPonto() {
           setLocalizacao(COORDENADA_EMPRESA_PADRAO);
         }
       } catch {
-        // Em caso de erro na obtenção do GPS do notebook/emulador, usa as coordenadas da empresa
         setLocalizacao(COORDENADA_EMPRESA_PADRAO);
       }
     }
@@ -74,166 +70,114 @@ export default function RegistrarPonto() {
     obterLocalizacao();
   }, []);
 
-  // Conversão e formatação da data em GMT-3 (Horário de Brasília)
-  const converterParaGMT3 = (data: Date) => {
-    const utc = data.getTime() + data.getTimezoneOffset() * 60000;
-    return new Date(utc - 3 * 3600000);
-  };
-
+  // Formatação de data e hora locais
   const formatarData = (data: Date) => {
-    const dataGMT3 = converterParaGMT3(data);
-    const dias = [
-      "Domingo",
-      "Segunda-Feira",
-      "Terça-Feira",
-      "Quarta-Feira",
-      "Quinta-Feira",
-      "Sexta-Feira",
-      "Sábado",
-    ];
-    const meses = [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
-    ];
-
-    return `${dias[dataGMT3.getDay()]}, ${dataGMT3.getDate()} de ${meses[dataGMT3.getMonth()]} de ${dataGMT3.getFullYear()}`;
+    const dataFormatada = data.toLocaleDateString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+    return dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
   };
 
   const formatarHora = (data: Date) => {
-    const dataGMT3 = converterParaGMT3(data);
-    const hora = dataGMT3.getHours().toString().padStart(2, "0");
-    const min = dataGMT3.getMinutes().toString().padStart(2, "0");
-    return `${hora} : ${min}`;
+    return data.toLocaleTimeString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
-  //! IMPLEMENTAÇÃO DO MODAL BIOMETRIA FOTO SE FOR POSSÍVEL
-  // const AbrirModalBiometriaFoto = async () => {
-  //   if (!localizacao) {
-  //     Alert.alert("Aviso", "Obtendo localização, aguarde...");
-  //     return;
-  //   }
-  //   const token = await getAuthToken();
+  // Função para validar e abrir o modal
+  const AbrirModalBiometriaFoto = async () => {
+    if (!localizacao) {
+      Alert.alert("Aviso", "Obtendo localização, aguarde...");
+      return;
+    }
 
-  //   if (!token) {
-  //     Alert.alert(
-  //       "Sessão Não Encontrada",
-  //       "Você precisa estar conectado à sua conta para registrar o ponto. Por favor, faça login novamente.",
-  //     );
-  //     return;
-  //   }
+    const token = await getAuthToken();
 
-  //   setModalBiometriaFotoVisivel(true);
-  // };
+    if (!token) {
+      Alert.alert(
+        "Sessão Não Encontrada",
+        "Você precisa estar conectado à sua conta para registrar o ponto. Por favor, faça login novamente."
+      );
+      return;
+    }
 
+    setModalBiometriaFotoVisivel(true);
+  };
 
-  // Envio da requisição de registro de ponto (Entrada / Saída)
-  // const handleRegistrar = async () => {
-  //   //! Modal
-  //   //setModalBiometriaFotoVisivel(false);
-  //   //   if (carregando || !localizacao) return;
-
-  //   //   setCarregando(true);
-  //   //   try {
-  //   //     const tipoRegistroId = tipoRegistro === "entrada" ? 1 : 2;
-
-  //   //     const resposta = await api.post("/RegistroPonto", {
-  //   //       latitude: localizacao.latitude,
-  //   //       longitude: localizacao.longitude,
-  //   //       tipoRegistroId: tipoRegistroId,
-  //   //     });
-
-  //   //     const mensagemSucesso =
-  //   //       typeof resposta.data === "string"
-  //   //         ? resposta.data
-  //   //         : `Ponto de ${
-  //   //             tipoRegistro === "entrada" ? "Entrada" : "Saída"
-  //   //           } registrado com sucesso!`;
-
-  //   //     Alert.alert("Sucesso", mensagemSucesso);
-
-  //   //     setTipoRegistro(tipoRegistro === "entrada" ? "saida" : "entrada");
-  //   //   } catch (error: any) {
-  //   //     if (error.response) {
-  //   //       const mensagem =
-  //   //         typeof error.response.data === "string"
-  //   //           ? error.response.data
-  //   //           : error.response.data?.mensagem ||
-  //   //             error.response.data?.message ||
-  //   //             "Erro ao registrar o ponto.";
-  //   //       Alert.alert("Atenção", mensagem);
-  //   //     } else {
-  //   //       Alert.alert(
-  //   //         "Erro de Conexão",
-  //   //         "Não foi possível comunicar com o servidor. Verifique se o backend está em execução.",
-  //   //       );
-  //   //     }
-  //   //   } finally {
-  //   //     setCarregando(false);
-  //   //   }
-  //   // };
-  //   if (!localizacao) {
-  //     Alert.alert("Aviso", "Obtendo localização, aguarde...");
-  //     return;
-  //   }
-
-  //   if (!getAuthToken()) {
-  //     Alert.alert(
-  //       "Sessão Não Encontrada",
-  //       "Você precisa estar conectado à sua conta para registrar o ponto. Por favor, faça login novamente."
-  //     );
-  //     return;
-  //   }
-
-  //   // setModalBiometriaFotoVisivel(true);
-  // };
-
-  const handleRegistrar = async () => {
-    // setModalBiometriaFotoVisivel(false);
+  // Envio da requisição de registro de ponto (recebendo a fotoUri tirada no modal)
+  const handleRegistrar = async (fotoUri?: string) => {
+    setModalBiometriaFotoVisivel(false);
 
     if (carregando || !localizacao) return;
+
+    if (!fotoUri) {
+      Alert.alert("Atenção", "A captura da foto é obrigatória para registrar o ponto.");
+      return;
+    }
 
     setCarregando(true);
 
     try {
-      // 1 = Entrada, 2 = Saída
       const tipoRegistroId = tipoRegistro === "entrada" ? 1 : 2;
 
-      const resposta = await api.post("/RegistroPonto", {
-        latitude: localizacao.latitude,
-        longitude: localizacao.longitude,
-        tipoRegistroId: tipoRegistroId,
+      // Cria o FormData para atender a APIs multipart/form-data
+      const formData = new FormData();
+      formData.append("latitude", String(localizacao.latitude));
+      formData.append("longitude", String(localizacao.longitude));
+      formData.append("tipoRegistroId", String(tipoRegistroId));
+
+      // Extrai nome e extensão da foto
+      const nomeArquivo = fotoUri.split("/").pop() || "foto_biometria.jpg";
+      const extensao = nomeArquivo.split(".").pop()?.toLowerCase();
+      const mimeType = extensao === "png" ? "image/png" : "image/jpeg";
+
+      // ⚠️ CHAVE CORRIGIDA: De "foto" para "FotoPonto" (exigido pelo backend .NET)
+      formData.append("FotoPonto", {
+        uri: fotoUri,
+        name: nomeArquivo.includes(".") ? nomeArquivo : `${nomeArquivo}.jpg`,
+        type: mimeType,
+      } as any);
+
+      const resposta = await api.post("/RegistroPonto", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       const mensagemSucesso =
         typeof resposta.data === "string"
           ? resposta.data
-          : `Ponto de ${tipoRegistro === "entrada" ? "Entrada" : "Saída"
-          } registrado com sucesso!`;
+          : `Ponto de ${tipoRegistro === "entrada" ? "Entrada" : "Saída"} registrado com sucesso!`;
 
       Alert.alert("Sucesso", mensagemSucesso);
-
-      // Alterna automaticamente entre entrada e saída após registro bem-sucedido
       setTipoRegistro(tipoRegistro === "entrada" ? "saida" : "entrada");
     } catch (error: any) {
       if (error.response) {
-        // Resposta de erro do backend (ex: regras de negócio / DomainException)
-        const mensagem =
-          typeof error.response.data === "string"
-            ? error.response.data
-            : error.response.data?.mensagem ||
-            error.response.data?.message ||
-            "Erro ao registrar o ponto.";
-        Alert.alert("Atenção", mensagem);
+        const data = error.response.data;
+        let mensagem = "";
+
+        if (typeof data === "string" && data.trim() !== "") {
+          mensagem = data;
+        } else if (data && typeof data === "object") {
+          mensagem =
+            data.mensagem ||
+            data.message ||
+            data.detail ||
+            data.title ||
+            (data.errors ? JSON.stringify(data.errors) : "");
+        }
+
+        if (!mensagem || mensagem.trim() === "") {
+          mensagem = `Erro no servidor (${error.response.status}). Verifique os dados fornecidos.`;
+        }
+
+        Alert.alert("Atenção!", mensagem);
       } else {
         Alert.alert(
           "Erro de Conexão",
@@ -247,7 +191,6 @@ export default function RegistrarPonto() {
 
   return (
     <View style={localStyles.mainContainer}>
-      {/* Imagem de Fundo com baixa opacidade */}
       <Image
         source={FULL_BACKGROUND}
         style={localStyles.fullBackgroundImage}
@@ -316,7 +259,7 @@ export default function RegistrarPonto() {
               )}
             </View>
 
-            {/* <Pressable
+            <Pressable
               onPress={AbrirModalBiometriaFoto}
               disabled={carregando}
               style={({ pressed }) => [
@@ -330,15 +273,15 @@ export default function RegistrarPonto() {
               ) : (
                 <Text style={styles.ButtonText}>Registrar</Text>
               )}
-            </Pressable> */}
+            </Pressable>
           </View>
         </View>
-        {/* 
+
         <ModalBiometriaFoto
           modalVisivel={modalBiometriaFotoVisivel}
-          confirmar={handleRegistrar}
+          confirmar={(fotoUri?: string) => handleRegistrar(fotoUri)}
           cancelar={() => setModalBiometriaFotoVisivel(false)}
-        /> */}
+        />
       </SafeAreaView>
     </View>
   );

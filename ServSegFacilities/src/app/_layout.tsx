@@ -24,6 +24,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AuthProvider>
         <Stack
+          // 1. ADICIONADO: Define qual rota abre primeiro
           initialRouteName="splash/index"
           screenOptions={{
             headerShown: false,

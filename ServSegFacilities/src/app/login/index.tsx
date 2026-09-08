@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Animated, Pressable, StyleSheet, Text, TextInput, View} from "react-native";
+import { Alert, Animated, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient"; // <--- Importação
 import { Colors, Font, H1, H2 } from "../../constants/theme";
 import Logo from "../../../assets/imgs/ServSeg Escuro.svg";
 import Biometria from "../../../assets/icons/Biometria.svg";
@@ -9,13 +10,8 @@ import { useRouter } from "expo-router";
 import { useAuthLocal } from "../../hooks/useAuthLocal";
 import ModalBiometria from "../../components/modals/modalBiometria/modalBiometria";
 
-// 1. Nova imagem de fundo para a tela inteira
 const FULL_BACKGROUND = require("../../../assets/imgs/Fundo.png");
-
-// 2. Imagem fixa de fundo (rodapé)
 const BASE_BACKGROUND = require("../../../assets/imgs/FundoMapas.png");
-
-// 3. Apenas os mapas que vão alternar no carrossel
 const MAP_IMAGES = [
   require("../../../assets/imgs/Mapa1.png"),
   require("../../../assets/imgs/Mapa2.png"),
@@ -27,21 +23,15 @@ export default function Login() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const [BioAtiva, setBioAtiva] = useState(false);
 
-  // Estado modal para visualização
   const [modalBiometriaVisivel, setModalBiometriaVisivel] = useState(false);
-
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-
-  // Armazenamento de email e senha digitados pelos usuário
-  // para caso aceite utilizar a biometria
   const [emailBiometria, setEmailBiometria] = useState("");
   const [senhaBiometria, setSenhaBiometria] = useState("");
 
   const { login } = useAuth();
   const router = useRouter();
 
-  const { resetarDados, ...restanteHook } = useAuthLocal();
   const {
     verificarPrimeiroLogin,
     salvarDados,
@@ -83,7 +73,6 @@ export default function Login() {
         console.warn("Aviso na verificação biométrica:", bioError);
       }
       if (devePerguntarBiometria) {
-        //Salva as informações do usuário e exibe o modal
         setEmailBiometria(emailDigitado);
         setSenhaBiometria(senhaDigitada);
         setModalBiometriaVisivel(true);
@@ -102,13 +91,10 @@ export default function Login() {
   async function cancelarBiometria(): Promise<void> {
     try {
       setModalBiometriaVisivel(false);
-
       await adiarAutenticacaoLocal();
-
       router.replace("/listaRegistro");
     } catch (error) {
       console.error("Erro ao adiar permissão de biometria:", error);
-
       router.replace("/listaRegistro");
     }
   }
@@ -122,20 +108,15 @@ export default function Login() {
           "Biometria indisponível",
           "Este dispositivo não possui biometria compatível ou não possui uma biometria cadastrada.",
         );
-
         return;
       }
 
       await salvarDados(emailBiometria, senhaBiometria);
-
       setBioAtiva(true);
-
       setModalBiometriaVisivel(false);
-
       router.replace("/listaRegistro");
     } catch (error) {
       console.error("Erro ao habilitar biometria:", error);
-
       Alert.alert("Biometria", "Não foi possível habilitar a biometria.");
     }
   }
@@ -143,13 +124,11 @@ export default function Login() {
   async function handleLoginBiometrico() {
     try {
       const resultado = await autenticar();
-
       if (resultado !== null) {
         router.replace("/listaRegistro");
       }
     } catch (error) {
       console.error("Erro na autenticação biométrica:", error);
-
       Alert.alert("Biometria", "Não foi possível autenticar por biometria.");
     }
   }
@@ -186,7 +165,7 @@ export default function Login() {
         backgroundColor: Colors.AzulFundo,
       }}
     >
-      {/* 1. Imagem de Fundo Geral (Com Opacidade Reduzida) */}
+      {/* 1. Imagem de Fundo Geral */}
       <Animated.Image
         source={FULL_BACKGROUND}
         style={localStyles.fullBackgroundImage}
@@ -210,6 +189,12 @@ export default function Login() {
           },
         ]}
         resizeMode="cover"
+      />
+
+      {/* 4. Degradê de Transição entre a tela e o rodapé */}
+      <LinearGradient
+        colors={[Colors.AzulFundo, "transparent"]}
+        style={localStyles.gradientOverlay}
       />
 
       <View style={localStyles.logo}>
@@ -280,6 +265,14 @@ const localStyles = StyleSheet.create({
     height: 350,
     position: "absolute",
     bottom: 0,
+  },
+
+  // Estilo do degradê adicionado
+  gradientOverlay: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: 350, // Mesma altura da imagem de fundo
   },
 
   logo: {

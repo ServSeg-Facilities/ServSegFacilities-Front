@@ -5,8 +5,8 @@ import { api } from "./api";
 export const DetalhesRegistroService = {
   // Faz a requisição para:
   // GET /HistoricoRegistroPonto
-  async buscarHistoricoId(historicoId: number | string): Promise<ListaRecebida> {
-    const resposta = await api.get<ListaRecebida>(`HistoricoRegistroPonto/ObterHistoricoPorId/${historicoId}`);
+  async buscarHistoricoId(historicoId: number | string): Promise<ListaRecebida[]> {
+    const resposta = await api.get<ListaRecebida[]>(`HistoricoRegistroPonto/ObterHistoricoPorId/${historicoId}`);
     
     // Retorna somente os dados da resposta.
     return resposta.data;

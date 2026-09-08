@@ -17,9 +17,14 @@ export function useDetalhesRegistro(historicoId: string) {
   // BUSCA E ORGANIZAÇÃO DOS DADOS
   // =============================
   async function carregarDetalhesRegistro() {
-    // Se a tela não recebeu um id pelo Router,
-    // não tem como descobrir quais informações devem ser exibidas.
+    console.log("======================================");
+    console.log("🔎 INÍCIO - carregarDetalhesRegistro");
+    console.log("🔎 historicoId recebido:", historicoId);
+    console.log("======================================");
+
     if (!historicoId) {
+      console.log("❌ historicoId NÃO informado");
+
       setLoading(false);
       setError("Histórico do registro não informado.");
       return;
@@ -29,64 +34,76 @@ export function useDetalhesRegistro(historicoId: string) {
       setLoading(true);
       setError(null);
 
-      // A API retorna os registros do usuário com base no id.
-      const historico =
+      console.log("🌐 Chamando buscarHistoricoId...");
+      console.log("🌐 historicoId enviado:", historicoId);
+
+      const historicoLista =
         await DetalhesRegistroService.buscarHistoricoId(historicoId);
+
+        const historico = historicoLista[0];
+
+      console.log("✅ buscarHistoricoId respondeu!");
+      console.log("📦 historico recebido:", historico);
 
       const detalhesConvertidos: ListaConvertida = {
         historicoId: historico.historicoId,
-
         registroPontoEntradaId: historico.registroPontoEntradaId,
-
         registroPontoSaidaId: historico.registroPontoSaidaId,
-
         dataHoraPontoEntrada: historico.dataHoraPontoEntrada,
-
         dataHoraPontoSaida: historico.dataHoraPontoSaida,
-
         latitudeEntrada: historico.latitudeEntrada,
-
         latitudeSaida: historico.latitudeSaida,
-
         longitudeEntrada: historico.longitudeEntrada,
-
         longitudeSaida: historico.longitudeSaida,
 
-        dataPontoEntrada: formatarData(historico.dataHoraPontoEntrada),
+        dataPontoEntrada: formatarData(
+          historico.dataHoraPontoEntrada
+        ),
 
-        // Se existir uma data de saída no histórico, formate essa data
-        // caso contrário, defina o campo como nulo.
         dataPontoSaida: historico.dataHoraPontoSaida
           ? formatarData(historico.dataHoraPontoSaida)
           : null,
 
-        horaPontoEntrada: formatarHorario(historico.dataHoraPontoEntrada),
+        horaPontoEntrada: formatarHorario(
+          historico.dataHoraPontoEntrada
+        ),
 
-        // Se existir um horário de saída no histórico, formate essa data
-        // caso contrário, defina o campo como nulo.
         horaPontoSaida: historico.dataHoraPontoSaida
           ? formatarHorario(historico.dataHoraPontoSaida)
           : null,
 
         nomeUsuario: historico.nomeUsuario,
-
         nomeEmpresa: historico.nomeEmpresa,
       };
-      
-      //Salva os dados
+
+      console.log("✅ detalhesConvertidos criado:");
+      console.log("📦 detalhesConvertidos:", detalhesConvertidos);
+
       setDetalhes(detalhesConvertidos);
+
+      console.log("✅ setDetalhes executado");
     } catch (error: any) {
-      //Tratamento de erro
+      console.log("======================================");
+      console.log("❌ ERRO NO carregarDetalhesRegistro");
+      console.log("❌ error:", error);
+      console.log("❌ message:", error?.message);
+      console.log("❌ response:", error?.response);
+      console.log("❌ status:", error?.response?.status);
+      console.log("❌ data:", error?.response?.data);
+      console.log("======================================");
+
       const mensagem =
         error.response?.data?.message ??
         error.response?.data ??
         "Não foi possível carregar as informações do registro de ponto.";
 
       setError(
-        typeof mensagem === "string" ? mensagem : JSON.stringify(mensagem),
+        typeof mensagem === "string"
+          ? mensagem
+          : JSON.stringify(mensagem)
       );
     } finally {
-      // Independentemente de sucesso ou erro, finaliza-se o carregamento.
+      console.log("🏁 FINALIZANDO carregarDetalhesRegistro");
       setLoading(false);
     }
   }

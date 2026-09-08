@@ -2,24 +2,28 @@ import { StyleSheet } from "react-native";
 import { Colors, P, H2 } from "../../constants/theme";
 
 export const styles = StyleSheet.create({
-    cardDetalhe:{
-        width: '100%',
-        minHeight: '60%',
-        backgroundColor: Colors.AzulContainer,
-        borderRadius: 8,
-        padding: 20,
-        shadowColor: Colors.AzulTexto,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-        elevation: 4,
+  cardDetalhe: {
+    width: '100%',
+    minHeight: '60%',
+    backgroundColor: Colors.AzulContainer,
+    borderRadius: 8,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
     },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
+  },
 
-    identificacaoENomeEmpresa:{
-        gap: 10
-    },
+  identificacaoENomeEmpresa: {
+    gap: 10
+  },
 
-    informacao: {
+  informacao: {
     gap: 5,
   },
 
@@ -30,7 +34,7 @@ export const styles = StyleSheet.create({
   },
 
   texto: {
-     ...H2,
+    ...H2,
     fontSize: 16,
     color: Colors.AzulTexto,
     textDecorationLine: "underline",
@@ -38,20 +42,24 @@ export const styles = StyleSheet.create({
   },
 
   campoValor: {
-    backgroundColor: Colors.AzulHeader, 
+    backgroundColor: Colors.AzulHeader,
     borderRadius: 6,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    shadowColor: Colors.AzulTexto,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   infoTexto: {
     ...P,
-    color: Colors.AzulTexto,
+    color: Colors.AzulFundo,
   },
 
   gridHorarios: {
@@ -72,15 +80,19 @@ export const styles = StyleSheet.create({
     width: "100%",
     textAlign: "center",
     backgroundColor: Colors.AzulHeader,
-    color: Colors.AzulTexto,
+    color: Colors.AzulFundo,
     fontWeight: "bold",
     paddingVertical: 8,
     borderRadius: 6,
-    shadowColor: Colors.AzulTexto,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   miniMapa: {
@@ -89,16 +101,29 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
     backgroundColor: "#E5E5E5",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   map: {
     width: "100%",
     height: "100%",
-    shadowColor: Colors.AzulTexto,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   mapaCarregando: {
@@ -107,6 +132,15 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     textAlignVertical: "center",
     color: Colors.AzulTexto,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   }
 
 });

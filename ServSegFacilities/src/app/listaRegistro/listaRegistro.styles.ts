@@ -1,15 +1,22 @@
 import { StyleSheet } from "react-native";
-import { Colors } from "../../constants/theme";
+import { Colors, Font } from "../../constants/theme";
 
-export const styles = StyleSheet.create({
+export const localStyles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: Colors.AzulFundo,
+  },
+  fullBackgroundImage: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    opacity: 0.1,
+  },
   container: {
     flex: 1,
   },
-
-  statusBar:{
-    backgroundColor: Colors.AzulHeader
-  },
-
   header: {
     backgroundColor: Colors.AzulHeader,
     paddingTop: 10,
@@ -27,50 +34,46 @@ export const styles = StyleSheet.create({
     gap: 5,
   },
 
-  headerAzul: {
-    width: "100%",
-    height: 100,
-    backgroundColor: "#007bff",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-    flexDirection: "row",
-    borderBottomLeftRadius: 30,
-  },
-
-  paiInpHeader: {
-    width: "90%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
   input: {
-    padding: 10,
+    paddingHorizontal: 10,
     width: "80%",
     borderRadius: 10,
     borderWidth: 2,
     borderColor: "white",
     color: "white",
+    marginTop: 5,
+    fontFamily: Font.regular, // <--- Aplicado a fonte no input
   },
 
   botaoFiltro: {
-    height: 40,
+    marginLeft: 20,
+    height: 30,
   },
 
   containerBotao: {
-    padding: 20,
+    padding: 30,
   },
 
   botaoRegistro: {
-    backgroundColor: "#113E82",
+    backgroundColor: Colors.AzulBotao,
     alignItems: "center",
     padding: 10,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   textoBotao: {
-    color: "white",
-    fontSize: 20,
+    color: Colors.AzulFundo,
+    fontSize: 25,
+    fontFamily: Font.regular, // <--- Aplicado a fonte em negrito
   },
 
   componentesCards: {
@@ -80,8 +83,9 @@ export const styles = StyleSheet.create({
 
   textoVazio: {
     textAlign: "center",
-    color: "#666",
-    marginTop: 20,
+    color: "#555",
+    marginTop: 0,
+    fontFamily: Font.regular, // <--- Aplicado a fonte no texto de lista vazia
   },
 
   pontaDireita: {

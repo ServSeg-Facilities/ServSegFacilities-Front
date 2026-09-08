@@ -1,70 +1,96 @@
-import {View,Text,TouchableOpacity,ActivityIndicator, Alert} from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Image,
+} from "react-native";
+
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { useLocalSearchParams, useRouter } from "expo-router";
+
 import { Colors } from "../../constants/theme";
-import { styles } from "./detalhesRegistro";
+
+import { localStyles } from "./detalhesRegistro";
+
 import CardDetalhe from "../../components/cardDetalhes/cardDetalhes";
+
 import { useDetalhesRegistro } from "../../hooks/useDetalhesRegistro";
-import {Header} from "../../components/header/header"
+
+import { Header } from "../../components/header/header";
 
 export default function DetalhesRegistro() {
+  const FULL_BACKGROUND = require("../../../assets/imgs/Fundo2.png");
+
   const router = useRouter();
-  // Recupera o parâmetro "historicoId" enviado pela tela anterior.
-  // Esse id será utilizado pelo hook para localizar os registros daquele dia.
-  const { historicoId } = useLocalSearchParams<{ historicoId: string }>();
-  // Informações provindas do hook
-  const { loading, error, detalhes, carregarDetalhesRegistro } =
-    useDetalhesRegistro(historicoId);
+
+  const { historicoId } =
+    useLocalSearchParams<{ historicoId: string }>();
+
+  const {
+    loading,
+    error,
+    detalhes,
+    carregarDetalhesRegistro,
+  } = useDetalhesRegistro(historicoId);
 
   // ======================
   // ESTADO DE CARREGAMENTO
   // ======================
-  // Enquanto os dados ainda estão sendo buscados/processados,
-  // a tela exibe o cabeçalho e um indicador de carregamento.
+
   if (loading) {
     return (
-      //Área segura para evitar sobreposição com status bar e outros elementos do sistema
-      <SafeAreaView style={styles.safeArea}>
-       <Header titulo="Detalhes" />
-        {/* 
-        Durante o carregamento, detalhes ainda pode ser null.
-        Por isso usa "..." como valor temporário.
-        */}
-        <Text style={styles.titulo}>
+      <View style={localStyles.safeArea}>
+        <Image
+          source={FULL_BACKGROUND}
+          style={localStyles.fullBackgroundImage}
+          resizeMode="cover"
+        />
+
+        <Header titulo="Detalhes" />
+
+        <Text style={localStyles.titulo}>
           Detalhes {detalhes?.dataPontoEntrada ?? "..."}
         </Text>
-        <View style={styles.container}>
-          <ActivityIndicator size="large" color={Colors.AzulBotao} />
-          <Text style={styles.titulo}>Carregando informações...</Text>
+
+        <View style={localStyles.container}>
+          <ActivityIndicator
+            size="large"
+            color={Colors.AzulBotao}
+          />
+
+          <Text style={localStyles.titulo}>
+            Carregando informações...
+          </Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // ==============
   // ESTADO DE ERRO
   // ==============
-  // Executado quando:
-  // - ocorreu algum erro na requisição/tratamento dos dados;
-  // - não foi encontrado um registro para a data solicitada.
+
   if (error || !detalhes) {
     return (
-      //Área segura para evitar sobreposição com status bar e outros elementos do sistema
-      <SafeAreaView style={styles.safeArea}>
+      <View style={localStyles.safeArea}>
+        <Image
+          source={FULL_BACKGROUND}
+          style={localStyles.fullBackgroundImage}
+          resizeMode="cover"
+        />
+
         <Header titulo="Detalhes" />
 
-        <View style={styles.container}>
-          <Text style={styles.titulo}>
+        <View style={localStyles.container}>
+          <Text style={localStyles.titulo}>
             {error || "Registro não encontrado."}
           </Text>
 
-          {/* 
-          Permite executar novamente a função do hook
-          para tentar buscar os dados.
-          */}
-          <View style={styles.container}>
+          <View style={localStyles.container}>
             <TouchableOpacity
-              style={styles.botaoTentarNovamente}
+              style={localStyles.botaoTentarNovamente}
               onPress={carregarDetalhesRegistro}
               activeOpacity={0.7}
             >
@@ -72,27 +98,31 @@ export default function DetalhesRegistro() {
             </TouchableOpacity>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
-// ============================
-// PROCESSAMENTO DE INFORMAÇÕES
-// ============================
+  // ============================
+  // PROCESSAMENTO DE INFORMAÇÕES
+  // ============================
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={localStyles.safeArea}>
+      <Image
+        source={FULL_BACKGROUND}
+        style={localStyles.fullBackgroundImage}
+        resizeMode="cover"
+      />
+
       <Header titulo="Detalhes" />
 
-      <Text style={styles.titulo}>Detalhes {detalhes.dataPontoEntrada}:</Text>
+      <Text style={localStyles.titulo}>
+        Detalhes {detalhes.dataPontoEntrada}:
+      </Text>
 
-      <View style={styles.container}>
-        {/* 
-        O CardDetalhe recebe o objeto já tratado pelo hook.
-        A responsabilidade do componente é somente apresentar
-        os dados visualmente.
-        */}
+      <View style={localStyles.container}>
         <CardDetalhe detalhes={detalhes} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

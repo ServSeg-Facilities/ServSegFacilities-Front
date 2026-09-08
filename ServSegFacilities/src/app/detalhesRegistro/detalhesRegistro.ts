@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 import { Colors, Container, H1, Button, H2 } from "../../constants/theme";
 
-export const styles = StyleSheet.create({
+export const localStyles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
@@ -32,6 +32,20 @@ export const styles = StyleSheet.create({
     color: Colors.AzulFundo,
     paddingHorizontal: 15,
   },
+  
+  // mainContainer: {
+  //   flex: 1,
+  //   backgroundColor: Colors.AzulFundo,
+  // },
+  
+  fullBackgroundImage: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    opacity: 0.1,
+  },
 
   container: {
     ...Container,
@@ -40,6 +54,15 @@ export const styles = StyleSheet.create({
     paddingTop: 25,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 
   titulo: {
@@ -52,5 +75,14 @@ export const styles = StyleSheet.create({
   botaoTentarNovamente: {
     ...Button,
     color: Colors.AzulFundo,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.60, // Aumentado de 0.30 para 0.60 para dobrar a intensidade
+    shadowRadius: 10,   // Espalha mais a sombra
+    // Sombra forte para Android
+    elevation: 16,     // Aumentado para dar mais destaque
   },
 });

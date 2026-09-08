@@ -6,6 +6,7 @@ import {
   Pressable,
   FlatList,
   StatusBar,
+  Image,
 } from "react-native";
 
 import CardLista from "../../components/cardLista/cardLista";
@@ -17,7 +18,10 @@ import { listaService } from "../../services/listaService";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "../../constants/theme";
-import { styles } from "./listaRegistro.styles";
+import { localStyles } from "./listaRegistro.styles";
+
+// Import da imagem de fundo
+const FULL_BACKGROUND = require("../../../assets/imgs/Fundo2.png");
 
 const formatarDataHora = (dataIsoString: string) => {
   const dataObjeto = new Date(dataIsoString);
@@ -56,9 +60,7 @@ export default function ListaRegistro() {
         await listaService.listarHistoricoPontos();
 
       const listaMapeada: ListaConvertida[] = resposta.map((item) => {
-        const entrada = formatarDataHora(
-          item.dataHoraPontoEntrada
-        );
+        const entrada = formatarDataHora(item.dataHoraPontoEntrada);
 
         const saida = item.dataHoraPontoSaida
           ? formatarDataHora(item.dataHoraPontoSaida)
@@ -118,44 +120,50 @@ export default function ListaRegistro() {
   }, [listaRegistro, termoPesquisa]);
 
   return (
-    <>
+    <View style={localStyles.mainContainer}>
       <StatusBar
         barStyle="light-content"
         backgroundColor={Colors.AzulHeader}
       />
 
+      <Image
+        source={FULL_BACKGROUND}
+        style={localStyles.fullBackgroundImage}
+        resizeMode="cover"
+      />
+
       <View
         style={[
-          styles.header,
+          localStyles.header,
           {
             paddingTop: insets.top + 10,
           },
         ]}
       >
-        <View style={styles.conteudoHeader}>
+        <View style={localStyles.conteudoHeader}>
           <TextInput
-            style={styles.input}
+            style={localStyles.input}
             placeholder="Pesquisar..."
             placeholderTextColor="#ccc"
             value={termoPesquisa}
             onChangeText={setTermoPesquisa}
           />
 
-          <Pressable style={styles.botaoFiltro}>
+          <Pressable style={localStyles.botaoFiltro}>
             <FiltroIcon width={40} height={40} />
           </Pressable>
         </View>
 
-        <View style={styles.pontaDireita} />
+        <View style={localStyles.pontaDireita} />
       </View>
 
-      <View style={styles.container}>
-        <View style={styles.containerBotao}>
+      <View style={localStyles.container}>
+        <View style={localStyles.containerBotao}>
           <Pressable
-            style={styles.botaoRegistro}
+            style={localStyles.botaoRegistro}
             onPress={() => router.push("/registrarPonto")}
           >
-            <Text style={styles.textoBotao}>
+            <Text style={localStyles.textoBotao}>
               Registrar Novo Ponto
             </Text>
           </Pressable>
@@ -173,15 +181,14 @@ export default function ListaRegistro() {
               horaSaida={item.horaPontoSaida}
             />
           )}
-          contentContainerStyle={styles.componentesCards}
+          contentContainerStyle={localStyles.componentesCards}
           ListEmptyComponent={
-            <Text style={styles.textoVazio}>
+            <Text style={localStyles.textoVazio}>
               Nenhum registro de entrada encontrado.
             </Text>
           }
         />
       </View>
-    </>
+    </View>
   );
 }
-

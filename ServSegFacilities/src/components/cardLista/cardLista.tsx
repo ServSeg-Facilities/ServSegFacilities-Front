@@ -3,6 +3,7 @@ import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./cardLista.styles";
 import { router } from "expo-router";
+import { Font } from "../../constants/theme";
 
 interface CardListaProps {
   historicoId: number;
@@ -31,26 +32,34 @@ export default function CardLista({
         })
       }
     >
-      <Text style={styles.dataTexto}>{data}</Text>
+      <Text style={[styles.dataTexto, { fontFamily: Font.bold }]}>
+        {data}
+      </Text>
 
       <View style={styles.linhaInfo}>
         <Ionicons name="business" size={20} color="#183059" />
 
-        <Text style={styles.infoTexto}>{empresa}</Text>
+        <Text style={[styles.infoTexto, { fontFamily: Font.regular }]}>
+          {empresa}
+        </Text>
       </View>
 
       <View style={styles.linhaHorarios}>
         <View style={styles.horarioEntrada}>
           <Ionicons name="log-in" size={20} color="#183059" />
 
-          <Text style={styles.infoTexto}>{horaEntrada}</Text>
+          <Text style={[styles.infoTexto, { fontFamily: Font.regular }]}>
+            {horaEntrada}
+          </Text>
         </View>
 
         {horaSaida && (
           <View style={styles.horarioSaida}>
             <Ionicons name="log-out" size={20} color="#183059" />
 
-            <Text style={styles.infoTexto}>{horaSaida}</Text>
+            <Text style={[styles.infoTexto, { fontFamily: Font.regular }]}>
+              {horaSaida}
+            </Text>
           </View>
         )}
       </View>

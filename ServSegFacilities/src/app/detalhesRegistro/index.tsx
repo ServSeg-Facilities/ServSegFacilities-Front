@@ -1,4 +1,4 @@
-import {View,Text,Pressable,TouchableOpacity,ActivityIndicator} from "react-native";
+import { View, Text, Pressable, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
@@ -6,7 +6,10 @@ import { Colors } from "../../constants/theme";
 import { styles } from "./detalhesRegistro";
 import CardDetalhe from "../../components/cardDetalhes/cardDetalhes";
 import { useDetalhesRegistro } from "../../hooks/useDetalhesRegistro";
-import {Header} from "../../components/header/header"
+import { Header } from "../../components/header/header";
+
+// Import da imagem de fundo
+const FULL_BACKGROUND = require("../../../assets/imgs/Fundo.png");
 
 export default function DetalhesRegistro() {
   const router = useRouter();
@@ -17,83 +20,94 @@ export default function DetalhesRegistro() {
   const { loading, error, detalhes, carregarDetalhesRegistro } =
     useDetalhesRegistro(data);
 
-  // ======================
-  // ESTADO DE CARREGAMENTO
-  // ======================
-  // Enquanto os dados ainda estão sendo buscados/processados,
-  // a tela exibe o cabeçalho e um indicador de carregamento.
-  if (loading) {
-    return (
-      //Área segura para evitar sobreposição com status bar e outros elementos do sistema
-      <SafeAreaView style={styles.safeArea}>
-       <Header titulo="Detalhes" />
-        {/* 
-        Durante o carregamento, detalhes ainda pode ser null.
-        Por isso usa "..." como valor temporário.
-        */}
-        <Text style={styles.titulo}>
-          Detalhes {detalhes?.dataHoraPonto ?? "..."}
-        </Text>
-        <View style={styles.container}>
-          <ActivityIndicator size="large" color={Colors.AzulBotao} />
-          <Text style={styles.titulo}>Carregando informações...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // Função para renderizar o conteúdo interno
+  const renderConteudo = () => {
+    // ======================
+    // ESTADO DE CARREGAMENTO
+    // ======================
+    if (loading) {
+      return (
+        <SafeAreaView style={styles.safeArea}>
+          <Header titulo="Detalhes" />
+          <Text style={styles.titulo}>
+            Detalhes {detalhes?.dataHoraPonto ?? "..."}
+          </Text>
+          <View style={styles.container}>
+            <ActivityIndicator size="large" color={Colors.AzulBotao} />
+            <Text style={styles.titulo}>Carregando informações...</Text>
+          </View>
+        </SafeAreaView>
+      );
+    }
 
-  // ==============
-  // ESTADO DE ERRO
-  // ==============
-  // Executado quando:
-  // - ocorreu algum erro na requisição/tratamento dos dados;
-  // - não foi encontrado um registro para a data solicitada.
-  if (error || !detalhes) {
+    // ==============
+    // ESTADO DE ERRO
+    // ==============
+    if (error || !detalhes) {
+      return (
+        <SafeAreaView style={styles.safeArea}>
+          <Header titulo="Detalhes" />
+
+          <View style={styles.container}>
+            <Text style={styles.titulo}>
+              {error || "Registro não encontrado."}
+            </Text>
+
+            <View style={styles.container}>
+              <TouchableOpacity
+                style={styles.botaoTentarNovamente}
+                onPress={carregarDetalhesRegistro}
+                activeOpacity={0.7}
+              >
+                <Text>Tente novamente</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </SafeAreaView>
+      );
+    }
+
+    // ============================
+    // PROCESSAMENTO DE INFORMAÇÕES
+    // ============================
     return (
-      //Área segura para evitar sobreposição com status bar e outros elementos do sistema
       <SafeAreaView style={styles.safeArea}>
         <Header titulo="Detalhes" />
-        
-        <View style={styles.container}>
-          <Text style={styles.titulo}>
-            {error || "Registro não encontrado."}
-          </Text>
 
-          {/* 
-          Permite executar novamente a função do hook
-          para tentar buscar os dados.
-          */}
-          <View style={styles.container}>
-            <TouchableOpacity
-              style={styles.botaoTentarNovamente}
-              onPress={carregarDetalhesRegistro}
-              activeOpacity={0.7}
-            >
-              <Text>Tente novamente</Text>
-            </TouchableOpacity>
-          </View>
+        <Text style={styles.titulo}>Detalhes {detalhes.dataHoraPonto}:</Text>
+
+        <View style={styles.container}>
+          <CardDetalhe detalhes={detalhes} />
         </View>
       </SafeAreaView>
     );
-  }
+  };
 
-// ============================
-// PROCESSAMENTO DE INFORMAÇÕES
-// ============================
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Header titulo="Detalhes" />
+    <View style={localStyles.mainContainer}>
+      {/* Imagem de Fundo em camada absoluta */}
+      <Image
+        source={FULL_BACKGROUND}
+        style={localStyles.fullBackgroundImage}
+        resizeMode="cover"
+      />
 
-      <Text style={styles.titulo}>Detalhes {detalhes.dataHoraPonto}:</Text>
-
-      <View style={styles.container}>
-        {/* 
-        O CardDetalhe recebe o objeto já tratado pelo hook.
-        A responsabilidade do componente é somente apresentar
-        os dados visualmente.
-        */}
-        <CardDetalhe detalhes={detalhes} />
-      </View>
-    </SafeAreaView>
+      {renderConteudo()}
+    </View>
   );
 }
+
+const localStyles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: Colors.AzulFundo,
+  },
+  fullBackgroundImage: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    opacity: 0.1,
+  },
+});

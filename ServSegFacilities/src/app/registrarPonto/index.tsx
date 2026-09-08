@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Pressable, Alert, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, Alert, ActivityIndicator, Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./registrarPonto.styles";
 import MapView, { Marker } from "react-native-maps";
@@ -9,6 +9,9 @@ import { Colors } from "../../constants/theme";
 import { api, getAuthToken } from "../../services/api";
 import { Header } from "../../components/header/header";
 import ModalBiometriaFoto from "../../components/modals/modalBiometriaFoto/modalBiometriaFoto";
+
+// Importação da imagem de fundo igual à tela de Login
+const FULL_BACKGROUND = require("../../../assets/imgs/Fundo2.png");
 
 const DEFAULT_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQWRtaW4iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbkBzZXJ2c2VnLmNvbSIsImlzcyI6IlNlcnZTZWdBUEkiLCJhdWQiOiJTZXJ2U2VnQVBJIiwibmJmIjoxNzg4MTc0ODI1LCJleHAiOjE4MTk3MTA4MjV9.mPpkv87L0YSdnxgCe2pNJLDmFmKjHJfm6B6U7R4whRo";
@@ -127,7 +130,6 @@ export default function RegistrarPonto() {
       return;
     }
 
-    // Se a localização e token do usuário forem capturados, abre o modal.
     setModalBiometriaFotoVisivel(true);
   };
 
@@ -176,92 +178,116 @@ export default function RegistrarPonto() {
     }
   };
 
-return (
-  <SafeAreaView style={styles.safeArea} edges={["bottom", "left", "right"]}>
-    <Header titulo="Ponto Eletrônico" />
+  return (
+    <View style={localStyles.mainContainer}>
+      {/* Imagem de Fundo com baixa opacidade */}
+      <Image
+        source={FULL_BACKGROUND}
+        style={localStyles.fullBackgroundImage}
+        resizeMode="cover"
+      />
 
-    <Text style={styles.titulo}>Registrar Ponto:</Text>
+      <SafeAreaView style={styles.safeArea} edges={["bottom", "left", "right"]}>
+        <Header titulo="Ponto Eletrônico" />
 
-    <View style={styles.container}>
-      <View style={styles.cardRegistro}>
-        <View style={styles.entradaSaida}>
-          <Pressable
-            style={[
-              styles.opcao,
-              tipoRegistro === "entrada" && styles.opcaoSelecionada,
-            ]}
-            onPress={() => setTipoRegistro("entrada")}
-          >
-            <AntDesign name="clock-circle" size={18} color={Colors.AzulTexto} />
-            <Text style={styles.opcaoTexto}>Entrada</Text>
-          </Pressable>
+        <Text style={styles.titulo}>Registrar Ponto:</Text>
 
-          <Pressable
-            style={[
-              styles.opcao,
-              tipoRegistro === "saida" && styles.opcaoSelecionada,
-            ]}
-            onPress={() => setTipoRegistro("saida")}
-          >
-            <AntDesign name="clock-circle" size={18} color={Colors.AzulTexto} />
-            <Text style={styles.opcaoTexto}>Saída</Text>
-          </Pressable>
-        </View>
+        <View style={styles.container}>
+          <View style={styles.cardRegistro}>
+            <View style={styles.entradaSaida}>
+              <Pressable
+                style={[
+                  styles.opcao,
+                  tipoRegistro === "entrada" && styles.opcaoSelecionada,
+                ]}
+                onPress={() => setTipoRegistro("entrada")}
+              >
+                <AntDesign name="clock-circle" size={18} color={Colors.AzulTexto} />
+                <Text style={styles.opcaoTexto}>Entrada</Text>
+              </Pressable>
 
-        <View style={styles.dataHora}>
-          <Text style={styles.data}>{formatarData(dataHoraAtual)}</Text>
-          <Text style={styles.horario}>{formatarHora(dataHoraAtual)}</Text>
-        </View>
+              <Pressable
+                style={[
+                  styles.opcao,
+                  tipoRegistro === "saida" && styles.opcaoSelecionada,
+                ]}
+                onPress={() => setTipoRegistro("saida")}
+              >
+                <AntDesign name="clock-circle" size={18} color={Colors.AzulTexto} />
+                <Text style={styles.opcaoTexto}>Saída</Text>
+              </Pressable>
+            </View>
 
-        <View style={styles.mapa}>
-          {localizacao ? (
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: localizacao.latitude,
-                longitude: localizacao.longitude,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
-              }}
-              showsUserLocation={true}
-              showsMyLocationButton={true}
+            <View style={styles.dataHora}>
+              <Text style={styles.data}>{formatarData(dataHoraAtual)}</Text>
+              <Text style={styles.horario}>{formatarHora(dataHoraAtual)}</Text>
+            </View>
+
+            <View style={styles.mapa}>
+              {localizacao ? (
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: localizacao.latitude,
+                    longitude: localizacao.longitude,
+                    latitudeDelta: 0.005,
+                    longitudeDelta: 0.005,
+                  }}
+                  showsUserLocation={true}
+                  showsMyLocationButton={true}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: localizacao.latitude,
+                      longitude: localizacao.longitude,
+                    }}
+                    title="Minha localização"
+                  />
+                </MapView>
+              ) : (
+                <Text style={styles.mapaCarregando}>Obtendo localização...</Text>
+              )}
+            </View>
+
+            <Pressable
+              onPress={AbrirModalBiometriaFoto}
+              disabled={carregando}
+              style={({ pressed }) => [
+                styles.button,
+                pressed && styles.buttonPressed,
+                carregando && { opacity: 0.6 },
+              ]}
             >
-              <Marker
-                coordinate={{
-                  latitude: localizacao.latitude,
-                  longitude: localizacao.longitude,
-                }}
-                title="Minha localização"
-              />
-            </MapView>
-          ) : (
-            <Text style={styles.mapaCarregando}>Obtendo localização...</Text>
-          )}
+              {carregando ? (
+                <ActivityIndicator color={Colors.AzulFundo} />
+              ) : (
+                <Text style={styles.ButtonText}>Registrar</Text>
+              )}
+            </Pressable>
+          </View>
         </View>
 
-        <Pressable
-          onPress={AbrirModalBiometriaFoto}
-          disabled={carregando}
-          style={({ pressed }) => [
-            styles.button,
-            pressed && styles.buttonPressed,
-            carregando && { opacity: 0.6 },
-          ]}
-        >
-          {carregando ? (
-            <ActivityIndicator color={Colors.AzulFundo} />
-          ) : (
-            <Text style={styles.ButtonText}>Registrar</Text>
-          )}
-        </Pressable>
-      </View>
+        <ModalBiometriaFoto
+          modalVisivel={modalBiometriaFotoVisivel}
+          confirmar={handleRegistrar}
+          cancelar={() => setModalBiometriaFotoVisivel(false)}
+        />
+      </SafeAreaView>
     </View>
-
-    <ModalBiometriaFoto
-      modalVisivel={modalBiometriaFotoVisivel}
-      confirmar={handleRegistrar}
-      cancelar={() => setModalBiometriaFotoVisivel(false)}
-    />
-  </SafeAreaView>
-);
+  );
 }
+
+const localStyles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: Colors.AzulFundo,
+  },
+  fullBackgroundImage: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    opacity: 0.1,
+  },
+});

@@ -7,6 +7,7 @@ import {
   Pressable,
   FlatList,
   StatusBar,
+  Image,
 } from "react-native";
 
 import CardLista from "../../components/cardLista/cardLista";
@@ -18,6 +19,9 @@ import { listaService } from "../../services/listaService";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "../../constants/theme";
+
+// Import da imagem de fundo
+const FULL_BACKGROUND = require("../../../assets/imgs/Fundo2.png");
 
 const formatarDataHora = (dataIsoString: string) => {
   const dataObjeto = new Date(dataIsoString);
@@ -118,10 +122,17 @@ export default function ListaRegistro() {
   }, [listaRegistro, termoPesquisa]);
 
   return (
-    <>
+    <View style={localStyles.mainContainer}>
       <StatusBar
         barStyle="light-content"
         backgroundColor={Colors.AzulHeader}
+      />
+
+      {/* Imagem de Fundo em camada absoluta */}
+      <Image
+        source={FULL_BACKGROUND}
+        style={localStyles.fullBackgroundImage}
+        resizeMode="cover"
       />
 
       <View
@@ -181,9 +192,24 @@ export default function ListaRegistro() {
           }
         />
       </View>
-    </>
+    </View>
   );
 }
+
+const localStyles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: Colors.AzulFundo,
+  },
+  fullBackgroundImage: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    opacity: 0.1,
+  },
+});
 
 const styles = StyleSheet.create({
   container: {

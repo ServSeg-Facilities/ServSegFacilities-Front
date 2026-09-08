@@ -1,28 +1,27 @@
 import { useEffect, useState } from "react";
-import { DetalhesRegistro } from "../@types/detalhesRegistro";
 import { DetalhesRegistroService } from "../services/detalhesRegistroService";
+import { ListaConvertida } from "../@types/lista";
 
-export function useDetalhesRegistro(data?: string) {
+export function useDetalhesRegistro(historicoId: string) {
   // ============================================================
   // ESTADOS -> Guarda os dados já organzizados para a tela
   // ============================================================
   // Enquanto a API não retornar, o valor é null.
-  const [detalhes, setDetalhes] = useState<DetalhesRegistro | null>(null);
+  const [detalhes, setDetalhes] = useState<ListaConvertida | null>(null);
   // Controla o carregamento da API.
   const [loading, setLoading] = useState(true);
   // Guarda uma mensagem de erro, caso aconteça.
   const [error, setError] = useState<string | null>(null);
 
-
   // =============================
   // BUSCA E ORGANIZAÇÃO DOS DADOS
   // =============================
   async function carregarDetalhesRegistro() {
-    // Se a tela não recebeu uma data pelo Router,
-    // não tem como descobrir qual dia deve ser exibido.
-    if (!data) {
+    // Se a tela não recebeu um id pelo Router,
+    // não tem como descobrir quais informações devem ser exibidas.
+    if (!historicoId) {
       setLoading(false);
-      setError("Data do registro não informada.");
+      setError("Histórico do registro não informado.");
       return;
     }
 
@@ -30,73 +29,52 @@ export function useDetalhesRegistro(data?: string) {
       setLoading(true);
       setError(null);
 
-      // A API retorna todos os registros do usuário.
-      const historico = await DetalhesRegistroService.buscarHistorico();
+      // A API retorna os registros do usuário com base no id.
+      const historico =
+        await DetalhesRegistroService.buscarHistoricoId(historicoId);
 
-      //Filtra somente os registros da data selecionada
-      const registrosDoDia = historico.filter((registro) => {
-        const dataRegistro = registro.dataHoraPonto.split("T")[0];
-        return dataRegistro == data;
-      });
+      const detalhesConvertidos: ListaConvertida = {
+        historicoId: historico.historicoId,
 
-      //Procura registros de entrada
-      const entrada = registrosDoDia.find(
-        (registro) => registro.tipoRegistro === "Entrada",
-      );
+        registroPontoEntradaId: historico.registroPontoEntradaId,
 
-      //Procura registros de saída
-      const saida = registrosDoDia.find(
-        (registro) => registro.tipoRegistro === "Saída" || registro.tipoRegistro === "Saida",
-      );
+        registroPontoSaidaId: historico.registroPontoSaidaId,
 
-      //Verificação de existência de entrada -> A entrada é obrigatória para montar o detalhe.
-      if (!entrada) {
-        setDetalhes(null);
-        setError("Registro de entrada não encontrado");
-        return;
-      }
+        dataHoraPontoEntrada: historico.dataHoraPontoEntrada,
 
-      // ------------------
-      // OBJETO PARA A TELA
-      // ------------------
-      // Transforma o formato da API -> LogHistoricoRegistroPonto 
-      // Para formato utilizado pelo componente -> DetalhesRegistro
-      const detalhes: DetalhesRegistro = {
-        // Informações gerais
-        nome: entrada.nomeUsuario,
-        dataHoraPonto: formatarData(entrada.dataHoraPonto),
-        razaoSocial: entrada.nomeEmpresa,
-        //Entrada
-        entrada: {
-          registroPontoId: entrada.registroPontoId,
-          // Converte: 2026-09-02T08:00:00 ->  08:00
-          horario: formatarHorario(entrada.dataHoraPonto),
-          //Localizacao
-          localizacao: {
-            latitude: entrada.latitude,
-            longitude: entrada.longitude,
-            precisao: entrada.precisao,
-          },
-        },
+        dataHoraPontoSaida: historico.dataHoraPontoSaida,
 
-        //Saída -> opcional.  Se existir, o objeto é monstado. Se não existir, fica undefined.
-        saida: saida
-          ? {
-              registroPontoId: saida.registroPontoId,
-              // Converte: 2026-09-02T08:00:00 ->  08:00
-              horario: formatarHorario(saida.dataHoraPonto),
-               //Localizacao
-              localizacao: {
-                latitude: saida.latitude,
-                longitude: saida.longitude,
-                precisao: saida.precisao,
-              },
-            }
-          : undefined,
+        latitudeEntrada: historico.latitudeEntrada,
+
+        latitudeSaida: historico.latitudeSaida,
+
+        longitudeEntrada: historico.longitudeEntrada,
+
+        longitudeSaida: historico.longitudeSaida,
+
+        dataPontoEntrada: formatarData(historico.dataHoraPontoEntrada),
+
+        // Se existir uma data de saída no histórico, formate essa data
+        // caso contrário, defina o campo como nulo.
+        dataPontoSaida: historico.dataHoraPontoSaida
+          ? formatarData(historico.dataHoraPontoSaida)
+          : null,
+
+        horaPontoEntrada: formatarHorario(historico.dataHoraPontoEntrada),
+
+        // Se existir um horário de saída no histórico, formate essa data
+        // caso contrário, defina o campo como nulo.
+        horaPontoSaida: historico.dataHoraPontoSaida
+          ? formatarHorario(historico.dataHoraPontoSaida)
+          : null,
+
+        nomeUsuario: historico.nomeUsuario,
+
+        nomeEmpresa: historico.nomeEmpresa,
       };
-      //Salva os dados
-      setDetalhes(detalhes);
       
+      //Salva os dados
+      setDetalhes(detalhesConvertidos);
     } catch (error: any) {
       //Tratamento de erro
       const mensagem =
@@ -116,7 +94,7 @@ export function useDetalhesRegistro(data?: string) {
   //Executa a busca quando a data mudar
   useEffect(() => {
     carregarDetalhesRegistro();
-  }, [data]);
+  }, [historicoId]);
 
   //Retorno do hook
   return {
@@ -126,9 +104,9 @@ export function useDetalhesRegistro(data?: string) {
     carregarDetalhesRegistro,
   };
 
-  // =================
+  // ====================
   // FORMATAÇÃO DATA/HORA
-  // =================
+  // ====================
   function formatarHorario(dataHora: string): string {
     return new Date(dataHora).toLocaleTimeString("pt-BR", {
       hour: "2-digit",
@@ -137,10 +115,8 @@ export function useDetalhesRegistro(data?: string) {
   }
 
   function formatarData(dataHora: string): string {
-  const [ano, mes, dia] = dataHora
-    .split("T")[0]
-    .split("-");
+    const [ano, mes, dia] = dataHora.split("T")[0].split("-");
 
-  return `${dia}/${mes}/${ano}`;
-}
+    return `${dia}/${mes}/${ano}`;
+  }
 }

@@ -3,15 +3,16 @@ import { styles } from "./cardDetalhes.styles";
 import { AntDesign, Feather, Octicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme";
 import MapView, { Marker } from "react-native-maps";
-import { DetalhesRegistro } from "../../@types/detalhesRegistro";
+import { ListaConvertida } from "../../@types/lista";
+
 
 // Recebe os detalhes já organizados pelo hook.
 // O componente não faz requisição para a API.
 interface CardDetalheProps {
-  detalhes: DetalhesRegistro;
+detalhes:ListaConvertida
 }
 
-export default function CardDetalhe({ detalhes }: CardDetalheProps) {
+export default function CardDetalhe({detalhes }: CardDetalheProps) {
   return (
     <View style={styles.cardDetalhe}>
       <View style={styles.identificacaoENomeEmpresa}>
@@ -23,7 +24,7 @@ export default function CardDetalhe({ detalhes }: CardDetalheProps) {
           </View>
 
           <View style={styles.campoValor}>
-            <Text style={styles.infoTexto}>{detalhes.nome}</Text>
+            <Text style={styles.infoTexto}>{detalhes.nomeUsuario}</Text>
           </View>
         </View>
 
@@ -35,7 +36,7 @@ export default function CardDetalhe({ detalhes }: CardDetalheProps) {
           </View>
 
           <View style={styles.campoValor}>
-            <Text style={styles.infoTexto}>{detalhes.razaoSocial}</Text>
+            <Text style={styles.infoTexto}>{detalhes.nomeEmpresa}</Text>
           </View>
         </View>
       </View>
@@ -51,24 +52,24 @@ export default function CardDetalhe({ detalhes }: CardDetalheProps) {
             <Text style={styles.texto}>Entrada</Text>
           </View>
 
-          <Text style={styles.horario}>{detalhes.entrada.horario}</Text>
+          <Text style={styles.horario}>{detalhes.horaPontoEntrada}</Text>
 
           <View style={styles.miniMapa}>
             <MapView
               style={styles.map}
               initialRegion={{
-                latitude: detalhes.entrada.localizacao.latitude,
-                longitude: detalhes.entrada.localizacao.longitude,
-                latitudeDelta: detalhes.entrada.localizacao.precisao,
-                longitudeDelta: detalhes.entrada.localizacao.precisao,
+                latitude: detalhes.latitudeEntrada,
+                longitude: detalhes.longitudeEntrada,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
               }}
               scrollEnabled={false}
               zoomEnabled={false}
             >
               <Marker
                 coordinate={{
-                  latitude: detalhes.entrada.localizacao.latitude,
-                  longitude: detalhes.entrada.localizacao.longitude,
+                  latitude: detalhes.latitudeEntrada,
+                  longitude: detalhes.longitudeEntrada,
                 }}
               />
             </MapView>
@@ -82,26 +83,28 @@ export default function CardDetalhe({ detalhes }: CardDetalheProps) {
             <Text style={styles.texto}>Saída</Text>
           </View>
 
-          {detalhes.saida ? (
+          {detalhes.horaPontoSaida &&
+          detalhes.latitudeSaida !== null &&
+          detalhes.longitudeSaida !== null ? (
             <>
-              <Text style={styles.horario}>{detalhes.saida.horario}</Text>
+              <Text style={styles.horario}>{detalhes.horaPontoSaida}</Text>
 
               <View style={styles.miniMapa}>
                 <MapView
                   style={styles.map}
                   initialRegion={{
-                    latitude: detalhes.saida.localizacao.latitude,
-                    longitude: detalhes.saida.localizacao.longitude,
-                    latitudeDelta: detalhes.saida.localizacao.precisao,
-                    longitudeDelta: detalhes.saida.localizacao.precisao,
+                    latitude: detalhes.latitudeSaida,
+                    longitude: detalhes.longitudeSaida,
+                    latitudeDelta: 0.005,
+                    longitudeDelta: 0.005,
                   }}
                   scrollEnabled={false}
                   zoomEnabled={false}
                 >
                   <Marker
                     coordinate={{
-                      latitude: detalhes.saida.localizacao.latitude,
-                      longitude: detalhes.saida.localizacao.longitude,
+                      latitude: detalhes.latitudeSaida,
+                      longitude: detalhes.longitudeSaida,
                     }}
                   />
                 </MapView>

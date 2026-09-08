@@ -1,7 +1,6 @@
-import {View,Text,Pressable,TouchableOpacity,ActivityIndicator} from "react-native";
+import {View,Text,TouchableOpacity,ActivityIndicator, Alert} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme";
 import { styles } from "./detalhesRegistro";
 import CardDetalhe from "../../components/cardDetalhes/cardDetalhes";
@@ -10,12 +9,12 @@ import {Header} from "../../components/header/header"
 
 export default function DetalhesRegistro() {
   const router = useRouter();
-  // Recupera o parâmetro "data" enviado pela tela anterior.
-  // Essa data será utilizada pelo hook para localizar os registros daquele dia.
-  const { data } = useLocalSearchParams<{ data: string }>();
+  // Recupera o parâmetro "historicoId" enviado pela tela anterior.
+  // Esse id será utilizado pelo hook para localizar os registros daquele dia.
+  const { historicoId } = useLocalSearchParams<{ historicoId: string }>();
   // Informações provindas do hook
   const { loading, error, detalhes, carregarDetalhesRegistro } =
-    useDetalhesRegistro(data);
+    useDetalhesRegistro(historicoId);
 
   // ======================
   // ESTADO DE CARREGAMENTO
@@ -32,7 +31,7 @@ export default function DetalhesRegistro() {
         Por isso usa "..." como valor temporário.
         */}
         <Text style={styles.titulo}>
-          Detalhes {detalhes?.dataHoraPonto ?? "..."}
+          Detalhes {detalhes?.dataPontoEntrada ?? "..."}
         </Text>
         <View style={styles.container}>
           <ActivityIndicator size="large" color={Colors.AzulBotao} />
@@ -53,7 +52,7 @@ export default function DetalhesRegistro() {
       //Área segura para evitar sobreposição com status bar e outros elementos do sistema
       <SafeAreaView style={styles.safeArea}>
         <Header titulo="Detalhes" />
-        
+
         <View style={styles.container}>
           <Text style={styles.titulo}>
             {error || "Registro não encontrado."}
@@ -84,7 +83,7 @@ export default function DetalhesRegistro() {
     <SafeAreaView style={styles.safeArea}>
       <Header titulo="Detalhes" />
 
-      <Text style={styles.titulo}>Detalhes {detalhes.dataHoraPonto}:</Text>
+      <Text style={styles.titulo}>Detalhes {detalhes.dataPontoEntrada}:</Text>
 
       <View style={styles.container}>
         {/* 

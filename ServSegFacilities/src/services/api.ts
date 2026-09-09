@@ -10,7 +10,11 @@ const normalizarBaseURL = (url?: string) => {
   return valorLimpo.endsWith("/api") ? valorLimpo : `${valorLimpo}/api`;
 };
 
-const host = Platform.OS === "android" ? "10.0.2.2" : "localhost";
+const ipMaquina = "169.254.51.5"
+const host = Platform.OS === "android"
+  ? ipMaquina
+  : "localhost";
+
 const porta = process.env.EXPO_PUBLIC_PORTA || "5080";
 const basePadrao = `http://${host}:${porta}/api`;
 
@@ -29,7 +33,8 @@ export const api = axios.create({
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json",
+    "Accept": "application/json",
+    "ngrok-skip-browser-warning": "true",
   },
 });
 
